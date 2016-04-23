@@ -1,3 +1,5 @@
+
+// ------------------------ SET UP MAP ----------------------
 // Set up size
 var width = 750,
 	height = width;
@@ -19,7 +21,44 @@ svg.append("image")
 	.attr("height", height)
 	.attr("xlink:href", "data/sf-map.svg");
 
+// -------------- LINK ARRAY OF INCIDENTS TO DOM ELEMENTS ---------------
+function drawPoints() {
+	d3.select("svg")
+		.selectAll("circle")
+		.data(allIncidents)
+		.enter()
+		.append("circle")
+		.attr("cx", function(d) { return projection(d.Location)[0] })
+		.attr("cy", function(d) { return projection(d.Location)[1] })
+		.attr("r", "1px")
+		.attr("fill", "red");
+}
+
+// --------------------- EXTRACT DATA FROM JSON FILE --------------------
+
+var allIncidents = [];
+
+d3.json("scpd_incidents.json", function(error, scpd_incidents) {
+	if (error) return console.warn(error);
+	console.log(scpd_incidents);
+	scpd_incidents.data.forEach(function(d) { // for each row in data table
+		//d.Date = format.parse(d.date); -- need to figure this out later
+		allIncidents.push(d); // put dynamically created object into array
+	});
+	console.log(allIncidents);
+	drawPoints();
+
+	// note to self location is an array with lat and long
+});
+
+
+
+
+
+
 /*
+
+What to do next
 
 1. Figure out how to read JSON file into the browser
 	- basically involves making extract_data.js work correctly
