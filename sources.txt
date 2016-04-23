@@ -6,5 +6,19 @@ http://stackoverflow.com/questions/14448482/d3-library-how-to-access-data-from-j
 * How to make JSON extraction --> array of Javascript objects
 http://stackoverflow.com/questions/14528385/how-to-convert-json-object-to-javascript-array
 
+TO-DOs:
+
+- Filter + front end for Radius -TUE
+- Filter + front end for Day -TUE
+- Filter + front end for Time -TUE
+- Filter + front end for Category -TUE
+- Layout
+- Map title 
+- Click + Description
+- Pretty CSS things
+
+WHAT IS THE CONVENTION FOR UPDATING DATA? 
+
+
 
 
