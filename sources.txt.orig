@@ -1,13 +1,10 @@
-glaces we got help during this assignment!
+Places we got help during this assignment!
 
-* How to extract data from JSON files: 
+* How to extract data from JSON file:
 http://stackoverflow.com/questions/14448482/d3-library-how-to-access-data-from-json-in-this-example
 
 * How to make JSON extraction --> array of Javascript objects
 http://stackoverflow.com/questions/14528385/how-to-convert-json-object-to-javascript-array
-
-* Example: simple interactive map that uses event listeners
-                          |  ------------------------|  https://suffenus.wordpress.com/2014/01/07/making-interactive-maps-with-d3-for-total-beginners/
 
 <<<<<<< HEAD
 TO-DOs:
