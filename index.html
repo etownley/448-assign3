@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	<style>
+
+	/* CSS goes here. */
+		#sidebar {
+			background-color: rgba(144, 144, 144, 0.6);
+			padding: 20px;
+			position: absolute;
+			top: 50px;
+			right: 50px;
+		}
+
+	</style>
+</head>
+<body>
+	<div id="map"></div>
+	<div id="sidebar">
+		<h5>Day of week</h5>
+		<div>
+			<button class="day-btn btn btn-primary" value="Monday">Monday</button>
+			<button class="day-btn btn btn-primary" value="Tuesday">Tuesday</button>
+			<button class="day-btn btn btn-primary" value="Wednesday">Wednesday</button>
+			<button class="day-btn btn btn-primary" value="Thursday">Thursday</button>
+			<button class="day-btn btn btn-primary" value="Friday">Friday</button>
+			<button class="day-btn btn btn-primary" value="Saturday">Saturday</button>
+			<button class="day-btn btn btn-primary" value="Sunday">Sunday</button>
+		</div>
+	</div>
+	<script src="lib/d3.js" charset="utf-8"></script>
+	<script src="lib/jquery.min.js" charset="utf-8"></script>
+	<script src="interaction.js"></script>
+</body>
+</html>

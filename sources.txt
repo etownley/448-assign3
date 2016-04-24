@@ -7,7 +7,7 @@ http://stackoverflow.com/questions/14448482/d3-library-how-to-access-data-from-j
 http://stackoverflow.com/questions/14528385/how-to-convert-json-object-to-javascript-array
 
 * Example: simple interactive map that uses event listeners
-                          |  ------------------------|  https://suffenus.wordpress.com/2014/01/07/making-interactive-maps-with-d3-for-total-beginners/
+ https://suffenus.wordpress.com/2014/01/07/making-interactive-maps-with-d3-for-total-beginners/
 
 <<<<<<< HEAD
 TO-DOs:
@@ -22,11 +22,4 @@ TO-DOs:
 - Pretty CSS things
 
 WHAT IS THE CONVENTION FOR UPDATING DATA? 
-
-
-
-=======
-* Example: simple interactive map that uses event listeners
-https://suffenus.wordpress.com/2014/01/07/making-interactive-maps-with-d3-for-total-beginners/
->>>>>>> fa8b450df339aec0cd6e81528e80fb77f8f2cf68
 
