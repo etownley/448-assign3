@@ -12,8 +12,16 @@ var projection = d3.geo.mercator()
 
 var incidents = [];
 
+/*
+ * We need to add a thing that says if empty state, include all, then when something is clicked
+ * dump everything and show only what was clicked
+ *
+ * We should also add a "reset" button that lets you deselect everything...
+ */
+
+
 var options = {
-	"DayOfWeek": [],
+	"DayOfWeek": ["Monday"],
 	"TimeRange": ["Morning", "Afternoon", "Night"],
 	"Category": ["OTHER OFFENSES"]
 };
@@ -144,6 +152,74 @@ function attachDayListeners() {
 	}
 }
 
+function attachTimeListeners() {
+	var buttons = document.getElementsByClassName("time-btn");
+
+	var handleClick = function(e) {
+		var TimeRange = e.target.value;
+		var existingIndex = options.TimeRange.indexOf(TimeRange);
+		if (existingIndex > -1) {
+			options.TimeRange.splice(existingIndex, 1);
+			e.target.classList.remove("active");
+		} else {
+			options.TimeRange.push(TimeRange);
+			e.target.classList.add("active");
+		}
+
+		filterIncidents(options);
+		drawPoints();
+	};
+
+	for (var i = 0; i < buttons.length; i++) {
+		buttons[i].addEventListener("click", handleClick);
+	}
+}
+
+function attachCategoryListeners() {
+	var buttons = document.getElementsByClassName("category-btn");
+
+	var handleClick = function(e) {
+		var category = e.target.value;
+		var existingIndex = options.Category.indexOf(category);
+		if (existingIndex > -1) {
+			options.TimeRange.splice(existingIndex, 1);
+			e.target.classList.remove("active");
+		} else {
+			options.Category.push(category);
+			e.target.classList.add("active");
+		}
+
+		filterIncidents(options);
+		drawPoints();
+	};
+
+	for (var i = 0; i < buttons.length; i++) {
+		buttons[i].addEventListener("click", handleClick);
+	}
+}
+
+function attachResetListener() {
+	var buttons = document.getElementsByClassName("reset-btn");
+
+	var handleClick = function(e) {
+		var category = e.target.value;
+		if (category) {
+			options.DayOfWeek.length = 0;
+			options.TimeRange = [];
+			options.Category = [];
+			for (incident in incidents) {
+				incident.Selected = true;
+			}
+		}
+	};
+	drawPoints();
+
+	buttons[0].addEventListener("click", handleClick);
+}
+
 document.addEventListener("DOMContentLoaded", function() {
 	attachDayListeners();
+	attachTimeListeners();
+	attachCategoryListeners();
+	attachResetListener();
 });

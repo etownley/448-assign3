@@ -1,4 +1,4 @@
-glaces we got help during this assignment!
+Places we got help during this assignment!
 
 * How to extract data from JSON files: 
 http://stackoverflow.com/questions/14448482/d3-library-how-to-access-data-from-json-in-this-example
@@ -8,6 +8,15 @@ http://stackoverflow.com/questions/14528385/how-to-convert-json-object-to-javasc
 
 * Example: simple interactive map that uses event listeners
  https://suffenus.wordpress.com/2014/01/07/making-interactive-maps-with-d3-for-total-beginners/
+
+* How to use the filter function:
+http://bl.ocks.org/d3noob/8dc93bce7e7200ab487d
+
+* How to use splice:
+https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice
+
+* Adding event listeners:
+http://stackoverflow.com/questions/19655189/javascript-click-event-listener-on-class
 
 <<<<<<< HEAD
 TO-DOs:

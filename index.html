@@ -13,11 +13,35 @@
 			right: 50px;
 		}
 
+		svg {
+			border: 10px #8A8A8A;
+		}
+
+		#maptitle {
+			font-size: 40px;
+			position: absolute;
+			top: 50px;
+			left: 50px;
+		}
+
+		#mapsubtitle {
+			font-size: 20px;
+			position: absolute;
+			top: 100px;
+			left: 50px;
+			color: #8A8A8A;
+		}
+
 	</style>
 </head>
 <body>
 	<div id="map"></div>
+	<div id = "maptitle">San Francisco Crime</div>
+	<div id = "mapsubtitle">April 1-15, 2016</div>
 	<div id="sidebar">
+		<button class="selection-btn btn btn-primary" value="Monday">Select home location</button>
+		<p style = "padding-top: 10px;">
+		<button class="selection-btn btn btn-primary" value="Tuesday">Select work location</button>
 		<h5>Day of week</h5>
 		<div>
 			<button class="day-btn btn btn-primary" value="Monday">Monday</button>
@@ -28,6 +52,27 @@
 			<button class="day-btn btn btn-primary" value="Saturday">Saturday</button>
 			<button class="day-btn btn btn-primary" value="Sunday">Sunday</button>
 		</div>
+		<h5>Time of Day</h5>
+		<div>
+			<button class="time-btn btn btn-primary" value="Morning">Morning</button>
+			<button class="time-btn btn btn-primary" value="Afternoon">Afternoon</button>
+			<button class="time-btn btn btn-primary" value="Night">Night</button>
+		</div>
+		<h5>Category</h5>
+		<div>
+			<button class="category-btn btn btn-primary" value="NON-CRIMINAL">Non-criminal</button>
+			<button class="category-btn btn btn-primary" value="LARCENY/THEFT">Larceny/Theft</button>
+			<button class="category-btn btn btn-primary" value="DRUG/NARCOTIC">Drug/Narcotic</button>
+			<button class="category-btn btn btn-primary" value="VEHICLE THEFT">Vehicle Theft</button>
+			<button class="category-btn btn btn-primary" value="BURGLARY">Burglary</button><p style="padding-top: 10px;">
+			<button class="category-btn btn btn-primary" value="OTHER OFFENSES">Other Offenses</button>
+			<button class="category-btn btn btn-primary" value="MISSING PERSON">Missing Person</button>
+			<button class="category-btn btn btn-primary" value="ASSAULT">Assault</button>
+			<button class="category-btn btn btn-primary" value="VANDALISM">Vandalism</button>
+			<button class="category-btn btn btn-primary" value="WARRANTS">Warrants</button>
+		</div>
+		<p style="padding-top: 30px;">
+			<button class="reset-btn btn btn-primary" value="reset">RESET</button>
 	</div>
 	<script src="lib/d3.js" charset="utf-8"></script>
 	<script src="lib/jquery.min.js" charset="utf-8"></script>
