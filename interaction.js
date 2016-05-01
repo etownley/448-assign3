@@ -21,9 +21,9 @@ var incidents = [];
 
 
 var options = {
-	"DayOfWeek": ["Monday"],
-	"TimeRange": ["Morning", "Afternoon", "Night"],
-	"Category": ["OTHER OFFENSES"]
+	"DayOfWeek": ["Sunday", "Monday", "Tuesday","Wedndesday", "Thursday", "Friday", "Saturday"],
+	"TimeRange": ["Morning", "Afternoon", "Night", "Late Night"],
+	"Category": ["NON-CRIMINAL", "LARCENY/THEFT", "DRUG/NARCOTIC", "VEHICLE THEFT", "BURGLARY", "OTHER OFFENSES", "MISSING PERSON", "ASSAULT", "VANDALISM", "WARRANTS"]
 };
 
 // Add an svg element to the DOM
@@ -38,7 +38,8 @@ svg.append("image")
 	.attr("xlink:href", "data/sf-map.svg");
 
 // -------------- LINK ARRAY OF INCIDENTS TO DOM ELEMENTS ---------------
-function drawPoints() {
+function drawPoints(drawAll) {
+
 	var filteredIncidents = incidents.filter(function(incident) {
 		return incident.Selected;
 	});
@@ -67,8 +68,10 @@ function convertTimeToRange(time) {
 		return "Morning";
 	} else if (hour >= 12 && hour < 19) {
 		return "Afternoon";
-	} else {
+	} else if (hour >= 0 && hour < 6) {
 		return "Night";
+	} else {
+		return "Late Night"; 
 	}
 }
 
@@ -104,6 +107,12 @@ function filterIncidents(options) {
 	});
 }
 
+function emptyOptions() {
+	options.DayOfWeek = [];
+	options.TimeRange = [];
+	options.Category = [];
+}
+
 d3.json("scpd_incidents.json", function(error, scpd_incidents) {
 	if (error) return console.warn(error);
 	scpd_incidents.data.forEach(function(d) { // for each row in data table
@@ -114,8 +123,10 @@ d3.json("scpd_incidents.json", function(error, scpd_incidents) {
 	});
 
 	drawPoints();
+	emptyOptions();
 	// note to self location is an array with lat and long
 });
+
 
 function findNearestCrimes(latitude, longitude, radius, options) {
 	for (incident in incidents) {
@@ -129,26 +140,75 @@ function findNearestCrimes(latitude, longitude, radius, options) {
 	}
 }
 
+function dayIndex(button) {
+	var DayOfWeek = button.value;
+	var existingIndex = options.DayOfWeek.indexOf(DayOfWeek);
+	console.log("Index of " + button.value + " = " + existingIndex);
+	return existingIndex;
+}
+
+function addOrRemoveDay(button) {
+	if (dayIndex(button) > -1) {
+		options.DayOfWeek.splice(dayIndex(button), 1);
+		button.classList.remove("active");
+	} else {
+		options.DayOfWeek.push(button.value);
+		button.classList.add("active");
+	}
+}
+
 function attachDayListeners() {
 	var buttons = document.getElementsByClassName("day-btn");
-
+	console.log(buttons);
 	var handleClick = function(e) {
-		var DayOfWeek = e.target.value;
-		var existingIndex = options.DayOfWeek.indexOf(DayOfWeek);
-		if (existingIndex > -1) {
-			options.DayOfWeek.splice(existingIndex, 1);
-			e.target.classList.remove("active");
-		} else {
-			options.DayOfWeek.push(DayOfWeek);
-			e.target.classList.add("active");
+		var button = e.target;
+		var DayOfWeek = button.value;
+		console.log(DayOfWeek);
+		if(DayOfWeek === "AllDays") { //handling the toggle on and off for all options
+			if(options.DayOfWeek.length === 7) { //if all the days are in there,
+				console.log("All days are in there");
+				options.DayOfWeek = [];
+				button.classList.remove("active");
+			} else {
+				for(var i = 0; i < buttons.length - 1; i++) {
+					if(dayIndex(buttons[i]) === -1 ) {
+						options.DayOfWeek.push(buttons[i].value);
+						button.classList.add("active");
+					}		
+				}
+			}
+			//for all the buttons, select as active and add to options. select All as active. 
+			//for all the buttons, deselect all as active and remove from options. select All as not active. 
+		} else { 
+			addOrRemoveDay(e.target);
+			var allDaysButton = document.getElementById("AllDays");
+			allDaysButton.classList.remove("active");
 		}
-
+		
 		filterIncidents(options);
 		drawPoints();
+		console.log(options.DayOfWeek);
 	};
 
 	for (var i = 0; i < buttons.length; i++) {
 		buttons[i].addEventListener("click", handleClick);
+	}
+}
+
+function timeIndex(button) {
+	var TimeRange = button.value;
+	var existingIndex = options.TimeRange.indexOf(TimeRange);
+		console.log("Index of " + button.value + " = " + existingIndex);
+	return existingIndex;
+}
+
+function addOrRemoveTime(button) {
+	if(timeIndex(button) > -1) {
+		options.TimeRange.splice(timeIndex(button), 1);
+		button.classList.remove("active");
+	} else {
+		options.TimeRange.push(button.value);
+		button.classList.add("active");
 	}
 }
 
@@ -156,18 +216,33 @@ function attachTimeListeners() {
 	var buttons = document.getElementsByClassName("time-btn");
 
 	var handleClick = function(e) {
-		var TimeRange = e.target.value;
-		var existingIndex = options.TimeRange.indexOf(TimeRange);
-		if (existingIndex > -1) {
-			options.TimeRange.splice(existingIndex, 1);
-			e.target.classList.remove("active");
+		var button = e.target;
+		var TimeRange = button.value;
+		if(TimeRange === "AllTimes") {
+			if(options.TimeRange.length === 4) {
+				console.log("All times are in there");
+				options.TimeRange = [];
+				button.classList.remove("active");
+			} else {
+				for(var i = 0; i < buttons.length -1; i++) {
+					if(timeIndex(buttons[i]) === -1) {
+						options.TimeRange.push(buttons[i].value);
+						button.classList.add("active");
+					}
+				}
+			}
 		} else {
-			options.TimeRange.push(TimeRange);
-			e.target.classList.add("active");
+			addOrRemoveTime(e.target);
+			//var allTimesButton = document.getElementById("AllTimes");
+			//allTimesButton.classList.remove("active");
 		}
+
 
 		filterIncidents(options);
 		drawPoints();
+
+		console.log(options.TimeRange);
+
 	};
 
 	for (var i = 0; i < buttons.length; i++) {
@@ -175,22 +250,54 @@ function attachTimeListeners() {
 	}
 }
 
+function categoryIndex(button) {
+	var Category = button.value;
+	var existingIndex = options.Category.indexOf(Category);
+	console.log("Index of " + button.value + " = " + existingIndex);
+	return existingIndex;
+}
+
+function addOrRemoveCategory(button) {
+	if(categoryIndex(button) > -1) {
+		options.Category.splice(categoryIndex(button), 1);
+		button.classList.remove("active");
+	} else {
+		options.Category.push(button.value);
+		button.classList.add("active");
+	}
+}
+
 function attachCategoryListeners() {
 	var buttons = document.getElementsByClassName("category-btn");
 
 	var handleClick = function(e) {
+		var button = e.target;
 		var category = e.target.value;
-		var existingIndex = options.Category.indexOf(category);
-		if (existingIndex > -1) {
-			options.TimeRange.splice(existingIndex, 1);
-			e.target.classList.remove("active");
+		if(category === "AllCategories") {
+			if(options.Category.length === 10) {
+				console.log("All categories are in there");
+				options.Category = [];
+				button.classList.remove("active");
+			} else {
+				for (var i = 0; i < buttons.length - 1; i++) {
+					if(categoryIndex(buttons[i]) === -1) {
+						options.Category.push(buttons[i].value);
+						button.classList.add("active");
+					}
+				}
+			}
+
 		} else {
-			options.Category.push(category);
-			e.target.classList.add("active");
+			addOrRemoveCategory(e.target);
+			//var allCategoriesButton = document.getElementById("AllCategories");
+			//allDaysButton.classList.remove("active");
 		}
+
 
 		filterIncidents(options);
 		drawPoints();
+		console.log(options.Category);
+
 	};
 
 	for (var i = 0; i < buttons.length; i++) {
@@ -202,17 +309,19 @@ function attachResetListener() {
 	var buttons = document.getElementsByClassName("reset-btn");
 
 	var handleClick = function(e) {
-		var category = e.target.value;
-		if (category) {
-			options.DayOfWeek.length = 0;
-			options.TimeRange = [];
-			options.Category = [];
-			for (incident in incidents) {
-				incident.Selected = true;
-			}
+		//BUG HERE: add all back into the category
+		options = {
+			"DayOfWeek": ["Sunday", "Monday", "Tuesday","Wedndesday", "Thursday", "Friday", "Saturday"],
+			"TimeRange": ["Morning", "Afternoon", "Night", "Late Night"],
+			"Category": ["NON-CRIMINAL", "LARCENY/THEFT", "DRUG/NARCOTIC", "VEHICLE THEFT", "BURGLARY", "OTHER OFFENSES", "MISSING PERSON", "ASSAULT", "VANDALISM", "WARRANTS"]
 		}
 	};
+	filterIncidents(options);
 	drawPoints();
+
+	console.log(options.DayOfWeek);
+	console.log(options.TimeRange);
+	console.log(options.Category);
 
 	buttons[0].addEventListener("click", handleClick);
 }
