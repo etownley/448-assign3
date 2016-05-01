@@ -53,7 +53,7 @@ function drawPoints(drawAll) {
 		.filter(function(d) { return d.Selected })
 		.attr("cx", function(d) { return projection(d.Location)[0] })
 		.attr("cy", function(d) { return projection(d.Location)[1] })
-		.attr("r", "1px")
+		.attr("r", "2px")
 		.attr("fill", "rgba(255, 0, 0, 0.3)");
 
 	map.exit().remove();
@@ -127,17 +127,71 @@ d3.json("scpd_incidents.json", function(error, scpd_incidents) {
 	// note to self location is an array with lat and long
 });
 
+function withinRadius(incident, radius, latitude, longitude) {
+	var latDiff = latitude - incident.location[0];
+	var longDiff = longitude - incident.location[1];
+	var distance = Math.sqrt(latDiff*latDiff + longDiff*longDiff); 
+	return (distance <= radius);
+}
 
-function findNearestCrimes(latitude, longitude, radius, options) {
-	for (incident in incidents) {
-		if ("crime_types" in options) {
-			var valid_types = options.crime_types;
-			if (incident.crime_type in valid_crime_types) {
-				// if not in filter then throw it
+//if location is reset, set lat and long back to 0. A location point is reset or not. 
+function isLegit(lat, long) { 
+	return (lat !== 0 && long !== 0); 
+}
+
+function satisfiesOptions(incident) {
+	var dayIndex = options.DayOfWeek.indexOf(incident.DayOfWeek);
+	var timeIndex = options.TimeRange.indexOf(incident.TimeRange);
+	var categoryIndex = options.Category.indexOf(incident.category);
+
+	return (dayIndex > -1 && timeIndex > -1 && categoryIndex > -1);
+	
+}
+
+function findNearestCrimes(lat1, long1, lat2, long2, radius) {
+	if(isLegit(lat1,long1) && isLegit(lat2,long2)) {
+		for (incident in incidents) {
+			if(withinRadius(incident, radius, lat1, long1) && withinRadius(incident, radius, lat2, long2)) {
+				if(satisfiesOptions(incident)) {
+					incident.selected = true;
+				}
+			} else {
+				incident.selected = false;
 			}
-			// filter by all crime types specified
+			/*
+			if ("crime_types" in options) {
+				var valid_types = options.crime_types;
+				if (incident.crime_type in valid_crime_types) {
+					// if not in filter then throw it
+				}
+				// filter by all crime types specified
+			}*/
+		}
+	} else if(isLegit(lat1,long1) && !isLegit(lat2,long2)) { //if only 1 point is selected
+		for (incident in incidents) {
+			if(withinRadius(incident, radius, lat1, long1)) {
+				if(satisfiesOptions(incident)) {
+					incident.selected = true;
+				}
+			} else {
+				incident.selected = false;
+			}
+			}
+		}
+	} else if(isLegit(lat1,long1) && !isLegit(lat2,long2)) {
+		for (incident in incidents) {
+			if(withinRadius(incident, radius, lat2, long2)) {
+				if(satisfiesOptions(incident)) {
+					incident.selected = true;
+				}
+			} else {
+				incident.selected = false;
+			}
+			}
 		}
 	}
+
+	
 }
 
 function dayIndex(button) {
