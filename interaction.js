@@ -131,73 +131,9 @@ d3.json("scpd_incidents.json", function(error, scpd_incidents) {
 	// note to self location is an array with lat and long
 });
 
-function withinRadius(incident, radius, latitude, longitude) {
-	var latDiff = latitude - incident.Location[0];
-	var longDiff = longitude - incident.Location[1];
-	var distance = Math.sqrt(latDiff*latDiff + longDiff*longDiff); 
-	return (distance <= radius);
-}
 
-//if location is reset, set lat and long back to 0. A location point is reset or not. 
-function isLegit(latitude, longitude) { 
-	console.log(latitude + ", " + longitude + " is legit or not");
-	return (latitude !== 0 && longitude !== 0); 
-}
 
-function satisfiesOptions(incident) {
-	var dayIndex = options.DayOfWeek.indexOf(incident.DayOfWeek);
-	var timeIndex = options.TimeRange.indexOf(incident.TimeRange);
-	var categoryIndex = options.Category.indexOf(incident.category);
 
-	return (dayIndex > -1 && timeIndex > -1 && categoryIndex > -1);
-
-}
-
-//Currently registers the right points, but display does not change. 
-
-function findNearestCrimes(lat1, long1, lat2, long2, radius) {
-	if(isLegit(lat1,long1) && isLegit(lat2,long2)) {
-		console.log("Both points legit");
-		incidents.forEach(function(incident, index, arr) {
-			//console.log("checking to see if " + arr[index] + " is within radius");
-			if(withinRadius(incident, radius, lat1, long1) && withinRadius(incident, radius, lat2, long2)) {
-				if(satisfiesOptions(incident)) {
-						console.log("Incident " + index + " is within radius");
-						arr[index].Selected = true;
-				}
-				console.log("Incident " + index + " is within radius but does not satisfy options");
-			} else {
-				console.log("Incident " + index + " is not within radius");
-				arr[index].Selected = false;
-			}
-		});
-	} else if (isLegit(lat1,long1) && !isLegit(lat2,long2)) {
-		console.log("Only first point legit");
-		incidents.forEach(function(incident, index, arr) {
-			if(withinRadius(incident, radius, lat1, long1)) {
-				if(satisfiesOptions(incident)) {
-					arr[index].Selected = true;
-				}
-			} else {
-				arr[index].Selected = false;
-			}
-		});
-	} else if (!isLegit(lat1,long1) && isLegit(lat2,long2)) {
-		console.log("Only second point legit");
-		incidents.forEach(function(incident, index, arr) {
-			if(withinRadius(incident, radius, lat2, long2)) {
-				if(satisfiesOptions(incident)) {
-					arr[index].Selected = true;
-				}
-			} else {
-				arr[index].Selected = false;
-			}
-		});
-	}
-	drawPoints();
-
-	
-}
 
 function dayIndex(button) {
 	var DayOfWeek = button.value;
@@ -397,6 +333,74 @@ document.addEventListener("DOMContentLoaded", function() {
 /**
 	---------- Adding home and work location on the map ----------
 **/
+
+function withinRadius(incident, radius, latitude, longitude) {
+	var latDiff = latitude - incident.Location[0];
+	var longDiff = longitude - incident.Location[1];
+	var distance = Math.sqrt(latDiff*latDiff + longDiff*longDiff); 
+	return (distance <= radius);
+}
+
+//if location is reset, set lat and long back to 0. A location point is reset or not. 
+function isLegit(latitude, longitude) { 
+	console.log(latitude + ", " + longitude + " is legit or not");
+	return (latitude !== 0 && longitude !== 0); 
+}
+
+function satisfiesOptions(incident) {
+	var dayIndex = options.DayOfWeek.indexOf(incident.DayOfWeek);
+	var timeIndex = options.TimeRange.indexOf(incident.TimeRange);
+	var categoryIndex = options.Category.indexOf(incident.Category);
+	console.log(dayIndex, timeIndex, categoryIndex);
+	return (dayIndex > -1 && timeIndex > -1 && categoryIndex > -1);
+
+}
+
+//Currently registers and figures out what points are within the radius, but does not render them on the screen correctly.. 
+
+function findNearestCrimes(lat1, long1, lat2, long2, radius) {
+	if(isLegit(lat1,long1) && isLegit(lat2,long2)) {
+		console.log("Both points legit");
+		incidents.forEach(function(incident, index, arr) {
+			//console.log("checking to see if " + arr[index] + " is within radius");
+			if(withinRadius(incident, radius, lat1, long1) && withinRadius(incident, radius, lat2, long2)) {
+				if(satisfiesOptions(incident)) {
+						console.log("Incident " + index + " is within radius");
+						arr[index].Selected = true;
+				}
+				console.log("Incident " + index + " is within radius but does not satisfy options");
+			} else {
+				console.log("Incident " + index + " is not within radius");
+				arr[index].Selected = false;
+			}
+		});
+	} else if (isLegit(lat1,long1) && !isLegit(lat2,long2)) {
+		console.log("Only first point legit");
+		incidents.forEach(function(incident, index, arr) {
+			if(withinRadius(incident, radius, lat1, long1)) {
+				if(satisfiesOptions(incident)) {
+					arr[index].Selected = true;
+				}
+			} else {
+				arr[index].Selected = false;
+			}
+		});
+	} else if (!isLegit(lat1,long1) && isLegit(lat2,long2)) {
+		console.log("Only second point legit");
+		incidents.forEach(function(incident, index, arr) {
+			if(withinRadius(incident, radius, lat2, long2)) {
+				if(satisfiesOptions(incident)) {
+					arr[index].Selected = true;
+				}
+			} else {
+				arr[index].Selected = false;
+			}
+		});
+	}
+	drawPoints();
+
+	
+}
 
 d3.select("svg").on("mousedown.log", function() {
   selectedPoint = projection.invert(d3.mouse(this));
