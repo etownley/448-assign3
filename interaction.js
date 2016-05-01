@@ -27,8 +27,9 @@ var selectRadius = 0.05; //Currently I hard-coded the radius just to test out fu
 var options = {
 	"DayOfWeek": ["Sunday", "Monday", "Tuesday","Wedndesday", "Thursday", "Friday", "Saturday"],
 	"TimeRange": ["Morning", "Afternoon", "Night", "Late Night"],
-	"Category": ["NON-CRIMINAL", "LARCENY/THEFT", "DRUG/NARCOTIC", "VEHICLE THEFT", "BURGLARY", "OTHER OFFENSES", "MISSING PERSON", "ASSAULT", "VANDALISM", "WARRANTS"]
+	"Category": ["ARSON", "ASSAULT", "BRIBERY", "BURGLARY", "DISORDERLY CONDUCT", "DRIVING UNDER THE INFLUENCE", "DRUG/NARCOTIC", "DRUNKENNESS", "EMBEZZLEMENT", "EXTORTION", "FAMILY OFFENSES", "FORGERY/COUNTERFEITING", "FRAUD", "GAMBLING", "KIDNAPPING", "LARCENY/THEFT", "LIQUOR LAWS", "LOITERING", "MISSING PERSON", "NON-CRIMINAL", "OTHER OFFENSES", "PROSTITUTION", "ROBBERY", "RUNAWAY", "SECONDARY CODES", "SEX OFFENSES, FORCIBLE", "SEX OFFENSES, NON FORCIBLE", "STOLEN PROPERTY", "SUICIDE", "SUSPICIOUS OCC", "TRESPASS", "VANDALISM", "VEHICLE THEFT", "WARRANTS", "WEAPON LAWS"]
 };
+
 
 // Add an svg element to the DOM
 var svg = d3.select("#map").append("svg")
@@ -117,6 +118,8 @@ function emptyOptions() {
 	options.Category = [];
 }
 
+var allCrimeTypes = {};
+
 d3.json("scpd_incidents.json", function(error, scpd_incidents) {
 	if (error) return console.warn(error);
 	scpd_incidents.data.forEach(function(d) { // for each row in data table
@@ -124,6 +127,7 @@ d3.json("scpd_incidents.json", function(error, scpd_incidents) {
 		d.Selected = true; // set default selected property to true
 		d.TimeRange = convertTimeToRange(d.Time);
 		incidents.push(d); // put dynamically created object into array
+		allCrimeTypes[d.Category] = 1;
 	});
 
 	drawPoints();
@@ -306,9 +310,9 @@ function attachResetListener() {
 	var handleClick = function(e) {
 		//BUG HERE: add all back into the category
 		options = {
-			"DayOfWeek": ["Sunday", "Monday", "Tuesday","Wedndesday", "Thursday", "Friday", "Saturday"],
+			"DayOfWeek": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
 			"TimeRange": ["Morning", "Afternoon", "Night", "Late Night"],
-			"Category": ["NON-CRIMINAL", "LARCENY/THEFT", "DRUG/NARCOTIC", "VEHICLE THEFT", "BURGLARY", "OTHER OFFENSES", "MISSING PERSON", "ASSAULT", "VANDALISM", "WARRANTS"]
+			"Category": ["ARSON", "ASSAULT", "BRIBERY", "BURGLARY", "DISORDERLY CONDUCT", "DRIVING UNDER THE INFLUENCE", "DRUG/NARCOTIC", "DRUNKENNESS", "EMBEZZLEMENT", "EXTORTION", "FAMILY OFFENSES", "FORGERY/COUNTERFEITING", "FRAUD", "GAMBLING", "KIDNAPPING", "LARCENY/THEFT", "LIQUOR LAWS", "LOITERING", "MISSING PERSON", "NON-CRIMINAL", "OTHER OFFENSES", "PROSTITUTION", "ROBBERY", "RUNAWAY", "SECONDARY CODES", "SEX OFFENSES, FORCIBLE", "SEX OFFENSES, NON FORCIBLE", "STOLEN PROPERTY", "SUICIDE", "SUSPICIOUS OCC", "TRESPASS", "VANDALISM", "VEHICLE THEFT", "WARRANTS", "WEAPON LAWS"]
 		}
 		filterIncidents(options);
 		drawPoints();
