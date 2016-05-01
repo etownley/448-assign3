@@ -11,10 +11,10 @@ var projection = d3.geo.mercator()
 	.translate([width / 2, height / 2]);
 
 var incidents = [];
-var location1 = [];
-var location2 = [];
+var location1 = [0,0];
+var location2 = [0,0];
 var mouseClick = 0; //Currently, it is hard-coded such that each odd click chooses the home, and even click chooses the work location.
-var selectRadius = 3; //Currently I hard-coded the radius just to test out functionality
+var selectRadius = 0.05; //Currently I hard-coded the radius just to test out functionality
 
 /*
  * We need to add a thing that says if empty state, include all, then when something is clicked
@@ -127,7 +127,7 @@ d3.json("scpd_incidents.json", function(error, scpd_incidents) {
 	});
 
 	drawPoints();
-	emptyOptions();
+	//emptyOptions();
 	// note to self location is an array with lat and long
 });
 
@@ -153,35 +153,46 @@ function satisfiesOptions(incident) {
 
 }
 
-//Currently takes in the wrong lat/long points
+//Currently registers the right points, but display does not change. 
 
 function findNearestCrimes(lat1, long1, lat2, long2, radius) {
 	if(isLegit(lat1,long1) && isLegit(lat2,long2)) {
+		console.log("Both points legit");
 		incidents.forEach(function(incident, index, arr) {
+			//console.log("checking to see if " + arr[index] + " is within radius");
 			if(withinRadius(incident, radius, lat1, long1) && withinRadius(incident, radius, lat2, long2)) {
-					if(satisfiesOptions(incident)) {
+				if(satisfiesOptions(incident)) {
+						console.log("Incident " + index + " is within radius");
 						arr[index].Selected = true;
-					}
-				} else {
-					arr[index].Selected = false;
 				}
+				console.log("Incident " + index + " is within radius but does not satisfy options");
+			} else {
+				console.log("Incident " + index + " is not within radius");
+				arr[index].Selected = false;
+			}
 		});
 	} else if (isLegit(lat1,long1) && !isLegit(lat2,long2)) {
-		if(withinRadius(incident, radius, lat1, long1)) {
+		console.log("Only first point legit");
+		incidents.forEach(function(incident, index, arr) {
+			if(withinRadius(incident, radius, lat1, long1)) {
 				if(satisfiesOptions(incident)) {
 					arr[index].Selected = true;
 				}
 			} else {
 				arr[index].Selected = false;
 			}
-	} else if (isLegit(lat1,long1) && !isLegit(lat2,long2)) {
-		if(withinRadius(incident, radius, lat2, long2)) {
-			if(satisfiesOptions(incident)) {
-				arr[index].Selected = true;
+		});
+	} else if (!isLegit(lat1,long1) && isLegit(lat2,long2)) {
+		console.log("Only second point legit");
+		incidents.forEach(function(incident, index, arr) {
+			if(withinRadius(incident, radius, lat2, long2)) {
+				if(satisfiesOptions(incident)) {
+					arr[index].Selected = true;
+				}
+			} else {
+				arr[index].Selected = false;
 			}
-		} else {
-			arr[index].Selected = false;
-		}
+		});
 	}
 	drawPoints();
 
@@ -363,9 +374,10 @@ function attachResetListener() {
 			"TimeRange": ["Morning", "Afternoon", "Night", "Late Night"],
 			"Category": ["NON-CRIMINAL", "LARCENY/THEFT", "DRUG/NARCOTIC", "VEHICLE THEFT", "BURGLARY", "OTHER OFFENSES", "MISSING PERSON", "ASSAULT", "VANDALISM", "WARRANTS"]
 		}
+		filterIncidents(options);
+		drawPoints();
 	};
-	filterIncidents(options);
-	drawPoints();
+	
 
 	console.log(options.DayOfWeek);
 	console.log(options.TimeRange);
@@ -396,6 +408,6 @@ d3.select("svg").on("mousedown.log", function() {
   	mouseClick--;
   }
   console.log(location1[0], location1[1], location2[0], location2[1], mouseClick);
-  findNearestCrimes(location1[0], location1[1], location1[0], location2[1], selectRadius);
+  findNearestCrimes(location1[0], location1[1], location2[0], location2[1], selectRadius);
  
 });
