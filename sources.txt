@@ -18,17 +18,7 @@ https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects
 * Adding event listeners:
 http://stackoverflow.com/questions/19655189/javascript-click-event-listener-on-class
 
-<<<<<<< HEAD
-TO-DOs:
-
-- Filter + front end for Radius -TUE
-- Filter + front end for Day -TUE
-- Filter + front end for Time -TUE
-- Filter + front end for Category -TUE
-- Layout
-- Map title 
-- Click + Description
-- Pretty CSS things
-
-WHAT IS THE CONVENTION FOR UPDATING DATA? 
+* Combined lines of this code directly to implement drag behavior
+https://jsfiddle.net/mdml/da37B/
+https://bl.ocks.org/mbostock/6123708
 

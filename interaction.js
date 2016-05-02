@@ -11,25 +11,16 @@ var projection = d3.geo.mercator()
 	.translate([width / 2, height / 2]);
 
 var incidents = [];
-var location1 = [0,0];
+var location1 = [100,100];
 var location2 = [0,0];
 var mouseClick = 0; //Currently, it is hard-coded such that each odd click chooses the home, and even click chooses the work location.
 var selectRadius = 0.05; //Currently I hard-coded the radius just to test out functionality
-
-/*
- * We need to add a thing that says if empty state, include all, then when something is clicked
- * dump everything and show only what was clicked
- *
- * We should also add a "reset" button that lets you deselect everything...
- */
-
 
 var options = {
 	"DayOfWeek": ["Sunday", "Monday", "Tuesday","Wednesday", "Thursday", "Friday", "Saturday"],
 	"TimeRange": ["Morning", "Afternoon", "Night", "Late Night"],
 	"Category": ["ARSON", "ASSAULT", "BRIBERY", "BURGLARY", "DISORDERLY CONDUCT", "DRIVING UNDER THE INFLUENCE", "DRUG/NARCOTIC", "DRUNKENNESS", "EMBEZZLEMENT", "EXTORTION", "FAMILY OFFENSES", "FORGERY/COUNTERFEITING", "FRAUD", "GAMBLING", "KIDNAPPING", "LARCENY/THEFT", "LIQUOR LAWS", "LOITERING", "MISSING PERSON", "NON-CRIMINAL", "OTHER OFFENSES", "PROSTITUTION", "ROBBERY", "RUNAWAY", "SECONDARY CODES", "SEX OFFENSES, FORCIBLE", "SEX OFFENSES, NON FORCIBLE", "STOLEN PROPERTY", "SUICIDE", "SUSPICIOUS OCC", "TRESPASS", "VANDALISM", "VEHICLE THEFT", "WARRANTS", "WEAPON LAWS"]
 };
-
 
 // Add an svg element to the DOM
 var svg = d3.select("#map").append("svg")
@@ -50,18 +41,62 @@ function drawPoints(drawAll) {
 	});
 
 	var map = d3.select("svg")
-		.selectAll("circle")
+		.selectAll("circle.incident")
 		.data(filteredIncidents);
 
 	map.enter()
 		.append("circle")
 		.filter(function(d) { return d.Selected })
+		.attr("class", "incident")
 		.attr("cx", function(d) { return projection(d.Location)[0] })
 		.attr("cy", function(d) { return projection(d.Location)[1] })
 		.attr("r", "2px")
 		.attr("fill", "rgba(255, 0, 0, 0.3)");
 
 	map.exit().remove();
+}
+
+var drag = d3.behavior.drag()
+    .on("drag", dragmove);
+
+function dragmove(d) {
+	d3.select(this).attr("cx", d.x = d3.event.x).attr("cy", d.y = d3.event.y);
+  //var x = d3.event.x;
+  //var y = d3.event.y;
+}
+
+function drawHome() {
+	homeLocation = [-122.490402, 37.786453];	
+
+	var map = d3.select("svg")
+		.selectAll("circle.home")
+		.data([homeLocation])
+		.enter()
+		.append("circle")
+		.attr("class", "home")
+		.attr("cx", function(d) { return projection(d)[0] })
+		.attr("cy", function(d) { return projection(d)[1] })
+		.attr("r", "10px")
+		.attr("fill", "blue")
+		.call(drag);
+
+}
+
+function drawWork() {
+	workLocation = [-122.389809, 37.72728];	
+
+	var map = d3.select("svg")
+		.selectAll("circle.work")
+		.data([workLocation])
+		.enter()
+		.append("circle")
+		.attr("class", "work")
+		.attr("cx", function(d) { return projection(d)[0] })
+		.attr("cy", function(d) { return projection(d)[1] })
+		.attr("r", "10px")
+		.attr("fill", "green")
+		.call(drag);
+
 }
 
 // --------------------- EXTRACT DATA FROM JSON FILE --------------------
@@ -80,16 +115,9 @@ function convertTimeToRange(time) {
 	}
 }
 
-/**
- * This function selects/deselects incidents based on criteria as specified in
+/*
+ * This function selects/deselects incidents based on criteria as specified in the
  * options object.
- *
- * Potential options
- * {
- *   "DayOfWeek": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
- *   "TimeRange": ["Morning", "Afternoon", "Night"],
- *   "Category": [...]
- * }
  */
 function filterIncidents(options) {
 	incidents.forEach(function(incident, index, arr) {
@@ -118,30 +146,24 @@ function emptyOptions() {
 	options.Category = [];
 }
 
-var allCrimeTypes = {};
-
 d3.json("scpd_incidents.json", function(error, scpd_incidents) {
 	if (error) return console.warn(error);
 	scpd_incidents.data.forEach(function(d) { // for each row in data table
-		//d.Date = format.parse(d.date); -- need to figure this out later
 		d.Selected = true; // set default selected property to true
 		d.TimeRange = convertTimeToRange(d.Time);
 		incidents.push(d); // put dynamically created object into array
-		allCrimeTypes[d.Category] = 1;
 	});
 
 	drawPoints();
+	drawHome();
+	drawWork();
 
 	var buttons = document.getElementsByClassName("default-selected");
 	for(var i = 0; i < buttons.length; i++) {
 		buttons[i].classList.add("active");
 	}
-	//emptyOptions();
 	// note to self location is an array with lat and long
 });
-
-
-
 
 
 function dayIndex(button) {
@@ -169,15 +191,6 @@ function attachDayListeners() {
 		var DayOfWeek = button.value;
 		console.log(DayOfWeek);
 		if(DayOfWeek === "AllDays") { //handling the toggle on and off for all options
-			if(false) { //if all the days are in there,
-				/*console.log("All days are in there");
-				options.DayOfWeek = [];
-				button.classList.remove("active");
-				for(var i = 0; i < buttons.length; i++) {
-					buttons[i].classList.remove("active");
-				}*/
-
-			} else {
 				for(var i = 0; i < buttons.length; i++) {
 					if(dayIndex(buttons[i]) === -1 ) {
 						options.DayOfWeek.push(buttons[i].value);
@@ -187,9 +200,7 @@ function attachDayListeners() {
 						}
 					}		
 				}
-			}
-			//for all the buttons, select as active and add to options. select All as active. 
-			//for all the buttons, deselect all as active and remove from options. select All as not active. 
+			
 		} else if (DayOfWeek === "NotAllDays") {
 			options.DayOfWeek = [];
 			console.log(options);
@@ -238,14 +249,6 @@ function attachTimeListeners() {
 		var button = e.target;
 		var TimeRange = button.value;
 		if(TimeRange === "AllTimes") {
-			if(false) {
-				/*console.log("All times are in there");
-				options.TimeRange = [];
-				button.classList.remove("active");
-				for(var i = 0; i < buttons.length; i++) {
-					buttons[i].classList.remove("active");
-				}*/
-			} else {
 				for(var i = 0; i < buttons.length -1; i++) {
 					if(timeIndex(buttons[i]) === -1) {
 						options.TimeRange.push(buttons[i].value);
@@ -256,7 +259,7 @@ function attachTimeListeners() {
 					}
 				}
 				
-			}
+			
 		} else if (TimeRange === "NotAllTimes") {
 			options.TimeRange = [];
 			console.log(options);
@@ -265,8 +268,6 @@ function attachTimeListeners() {
 			}
 		} else {
 			addOrRemoveTime(e.target);
-			//var allTimesButton = document.getElementById("AllTimes");
-			//allTimesButton.classList.remove("active");
 		}
 
 
@@ -306,11 +307,6 @@ function attachCategoryListeners() {
 		var button = e.target;
 		var category = e.target.value;
 		if(category === "AllCategories") {
-			if(false) {
-				/*console.log("All categories are in there");
-				options.Category = [];
-				button.classList.remove("active");*/
-			} else {
 				for (var i = 0; i < buttons.length - 1; i++) {
 					if(categoryIndex(buttons[i]) === -1) {
 						options.Category.push(buttons[i].value);
@@ -320,7 +316,7 @@ function attachCategoryListeners() {
 						buttons[i].classList.remove("active");
 					}
 				}
-			}
+			
 
 		} else if (category === "NotAllCategories") {
 			options.Category = [];
@@ -330,8 +326,6 @@ function attachCategoryListeners() {
 			}
 		} else {
 			addOrRemoveCategory(e.target);
-			//var allCategoriesButton = document.getElementById("AllCategories");
-			//allDaysButton.classList.remove("active");
 		}
 
 
@@ -371,6 +365,21 @@ function attachCategoryListeners() {
 
 	buttons[0].addEventListener("click", handleClick);
 }*/
+
+function addHomeLocListener() {
+	var homeButton = document.getElementsByClassName("home-btn");
+
+	var handleClick = function(e) {
+		var button = e.target;
+		var buttonName = e.target.value;
+		if(buttonName === "Home") {
+
+		}
+
+	};
+
+	homeButton.addEventListener("click", handleClick);
+}
 
 document.addEventListener("DOMContentLoaded", function() {
 	attachDayListeners();
@@ -448,11 +457,9 @@ function findNearestCrimes(lat1, long1, lat2, long2, radius) {
 		});
 	}
 	drawPoints();
-
-	
 }
 
-d3.select("svg").on("mousedown.log", function() {
+/*d3.select("svg").on("mousedown.log", function() {
   selectedPoint = projection.invert(d3.mouse(this));
   if(mouseClick === 0) {
   	location1 = selectedPoint;
@@ -464,4 +471,4 @@ d3.select("svg").on("mousedown.log", function() {
   console.log(location1[0], location1[1], location2[0], location2[1], mouseClick);
   findNearestCrimes(location1[0], location1[1], location2[0], location2[1], selectRadius);
  
-});
+});*/
