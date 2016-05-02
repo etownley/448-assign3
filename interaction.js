@@ -169,31 +169,39 @@ function attachDayListeners() {
 		var DayOfWeek = button.value;
 		console.log(DayOfWeek);
 		if(DayOfWeek === "AllDays") { //handling the toggle on and off for all options
-			if(options.DayOfWeek.length === 7 || options.DayOfWeek.length === 8) { //if all the days are in there,
-				console.log("All days are in there");
+			if(false) { //if all the days are in there,
+				/*console.log("All days are in there");
 				options.DayOfWeek = [];
 				button.classList.remove("active");
 				for(var i = 0; i < buttons.length; i++) {
 					buttons[i].classList.remove("active");
-				}
+				}*/
 
 			} else {
 				for(var i = 0; i < buttons.length; i++) {
 					if(dayIndex(buttons[i]) === -1 ) {
 						options.DayOfWeek.push(buttons[i].value);
 						buttons[i].classList.add("active");
-						//for(var i = 0; i < buttons.length; i++) {
-						//	buttons[i].classList.add("active");
-						//}
+						if(buttons[i].value === "AllDays" || buttons[i].value === "NotAllDays") {
+							buttons[i].classList.remove("active");
+						}
 					}		
 				}
 			}
 			//for all the buttons, select as active and add to options. select All as active. 
 			//for all the buttons, deselect all as active and remove from options. select All as not active. 
+		} else if (DayOfWeek === "NotAllDays") {
+			options.DayOfWeek = [];
+			console.log(options);
+			for(var i = 0; i < buttons.length; i++) {
+				buttons[i].classList.remove("active");
+			}
 		} else { 
 			addOrRemoveDay(e.target);
 			var allDaysButton = document.getElementById("AllDays");
 			allDaysButton.classList.remove("active");
+
+
 		}
 		
 		filterIncidents(options);
@@ -230,17 +238,30 @@ function attachTimeListeners() {
 		var button = e.target;
 		var TimeRange = button.value;
 		if(TimeRange === "AllTimes") {
-			if(options.TimeRange.length === 4) {
-				console.log("All times are in there");
+			if(false) {
+				/*console.log("All times are in there");
 				options.TimeRange = [];
 				button.classList.remove("active");
+				for(var i = 0; i < buttons.length; i++) {
+					buttons[i].classList.remove("active");
+				}*/
 			} else {
 				for(var i = 0; i < buttons.length -1; i++) {
 					if(timeIndex(buttons[i]) === -1) {
 						options.TimeRange.push(buttons[i].value);
-						button.classList.add("active");
+						buttons[i].classList.add("active");
+					}
+					if(buttons[i].value === "AllTimes") {
+						buttons[i].classList.remove("active");
 					}
 				}
+				
+			}
+		} else if (TimeRange === "NotAllTimes") {
+			options.TimeRange = [];
+			console.log(options);
+			for(var i = 0; i < buttons.length; i++) {
+				buttons[i].classList.remove("active");
 			}
 		} else {
 			addOrRemoveTime(e.target);
@@ -285,19 +306,28 @@ function attachCategoryListeners() {
 		var button = e.target;
 		var category = e.target.value;
 		if(category === "AllCategories") {
-			if(options.Category.length === 10) {
-				console.log("All categories are in there");
+			if(false) {
+				/*console.log("All categories are in there");
 				options.Category = [];
-				button.classList.remove("active");
+				button.classList.remove("active");*/
 			} else {
 				for (var i = 0; i < buttons.length - 1; i++) {
 					if(categoryIndex(buttons[i]) === -1) {
 						options.Category.push(buttons[i].value);
-						button.classList.add("active");
+						buttons[i].classList.add("active");
+					}
+					if(buttons[i].value === "AllCategories") {
+						buttons[i].classList.remove("active");
 					}
 				}
 			}
 
+		} else if (category === "NotAllCategories") {
+			options.Category = [];
+			console.log(options);
+			for(var i = 0; i < buttons.length; i++) {
+				buttons[i].classList.remove("active");
+			}
 		} else {
 			addOrRemoveCategory(e.target);
 			//var allCategoriesButton = document.getElementById("AllCategories");
@@ -316,7 +346,7 @@ function attachCategoryListeners() {
 	}
 }
 
-function attachResetListener() {
+/*function attachResetListener() {
 	var buttons = document.getElementsByClassName("reset-btn");
 
 	var handleClick = function(e) {
@@ -340,13 +370,13 @@ function attachResetListener() {
 	console.log(options.Category);
 
 	buttons[0].addEventListener("click", handleClick);
-}
+}*/
 
 document.addEventListener("DOMContentLoaded", function() {
 	attachDayListeners();
 	attachTimeListeners();
 	attachCategoryListeners();
-	attachResetListener();
+	//attachResetListener();
 });
 
 

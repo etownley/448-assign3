@@ -48,7 +48,7 @@
 		<button class="selection-btn btn btn-primary" value="Home">Select home location</button>
 		<p style = "padding-top: 10px;">
 		<button class="selection-btn btn btn-primary" value="Work">Select work location</button>
-		<h5>Day of week</h5> 
+		<h5>Day of Week</h5> 
 		<div id = "dayButtons">
 			<button class="day-btn btn btn-primary default-selected" value="Monday">Monday</button>
 			<button class="day-btn btn btn-primary default-selected" value="Tuesday">Tuesday</button>
@@ -57,7 +57,10 @@
 			<button class="day-btn btn btn-primary default-selected" value="Friday">Friday</button>
 			<button class="day-btn btn btn-primary default-selected" value="Saturday">Saturday</button>
 			<button class="day-btn btn btn-primary default-selected" value="Sunday">Sunday</button>
-			<button class="day-btn btn btn-primary default-selected" id = "AllDays" value="AllDays">All</button>
+			<div id = "dayButtonOptions">
+				<button class="day-btn btn btn-primary" id = "AllDays" value="AllDays">Select All</button>
+				<button class="day-btn btn btn-primary" id = "NotAllDays" value="NotAllDays">Deselect All</button>
+			</div>
 		</div>
 		<h5>Time of Day</h5>
 		<div id = "timeButtons">
@@ -65,7 +68,10 @@
 			<button class="time-btn btn btn-primary default-selected" value="Afternoon">Afternoon (12:00pm - 06:00pm)</button>
 			<button class="time-btn btn btn-primary default-selected" value="Night">Night (06:00pm - 12:00am)</button>
 			<button class="time-btn btn btn-primary default-selected" value="Late Night"> Late Night (12:00am - 06:00am)</button>
-			<button class="time-btn btn btn-primary default-selected" value="AllTimes">All</button>
+			<div id = "timeButtonOptions">
+				<button class="time-btn btn btn-primary" value="AllTimes">Select All</button>
+				<button class="time-btn btn btn-primary" value="NotAllTimes">Deselect All</button>
+			</div>
 		</div>
 		<h5>Category</h5>
 		<div id = "categoryButtons">
@@ -104,10 +110,13 @@
 			<button class="category-btn btn btn-primary default-selected" value="VEHICLE THEFT">Vehicle Theft</button>
 			<button class="category-btn btn btn-primary default-selected" value="WARRANTS">Warrants</button>
 			<button class="category-btn btn btn-primary default-selected" value="WEAPON LAWS">Weapon Laws</button>
-			<button class="category-btn btn btn-primary default-selected" value="AllCategories">All</button>
+			<div id = "categoryButtonOptions">
+				<button class="category-btn btn btn-primary" value="AllCategories">Select All</button>
+				<button class="category-btn btn btn-primary" value="NotAllCategories">Deselect All</button>
+			</div>
 		</div>
 		<p style="padding-top: 30px;">
-			<button class="reset-btn btn btn-primary" value="reset">Show All</button>
+			<!--<button class="reset-btn btn btn-primary" value="reset">Show All</button>-->
 	</div>
 	<script src="lib/d3.js" charset="utf-8"></script>
 	<script src="lib/jquery.min.js" charset="utf-8"></script>
