@@ -157,6 +157,8 @@ d3.json("scpd_incidents.json", function(error, scpd_incidents) {
 	drawPoints();
 	drawHome();
 	drawWork();
+	makeSlider("home");
+	makeSlider("work");
 
 	var buttons = document.getElementsByClassName("default-selected");
 	for(var i = 0; i < buttons.length; i++) {
@@ -366,21 +368,6 @@ function attachCategoryListeners() {
 	buttons[0].addEventListener("click", handleClick);
 }*/
 
-function addHomeLocListener() {
-	var homeButton = document.getElementsByClassName("home-btn");
-
-	var handleClick = function(e) {
-		var button = e.target;
-		var buttonName = e.target.value;
-		if(buttonName === "Home") {
-
-		}
-
-	};
-
-	homeButton.addEventListener("click", handleClick);
-}
-
 document.addEventListener("DOMContentLoaded", function() {
 	attachDayListeners();
 	attachTimeListeners();
@@ -472,3 +459,73 @@ function findNearestCrimes(lat1, long1, lat2, long2, radius) {
   findNearestCrimes(location1[0], location1[1], location2[0], location2[1], selectRadius);
  
 });*/
+
+// ---------------- MAKING RADIUS SLIDER -------------------
+
+function makeSlider(title) {
+
+	var sliderType = title;
+
+var margin = {top: 0, right: 50, bottom: 0, left: 50},
+    width = 200,
+    height = 200;
+
+var x = d3.scale.linear()
+    .domain([0, 50])
+    .range([0, width])
+
+var brush = d3.svg.brush()
+    .x(x)
+    .extent([0, 0])
+    .on("brush", brushed);
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+svg.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height / 2 + ")")
+    .call(d3.svg.axis()
+      .scale(x)
+      .orient("bottom")
+      .tickFormat(function(d) { return d; })
+      .tickSize(1)
+      .tickPadding(12))
+  .select(".domain")
+  .select(function() { return this.parentNode.appendChild(this.cloneNode(true)); })
+    .attr("class", "halo");
+
+var slider = svg.append("g")
+    .attr("class", "slider")
+    .call(brush);
+
+slider.selectAll(".extent,.resize")
+    .remove();
+
+slider.select(".background")
+    .attr("height", height);
+
+var handle = slider.append("circle")
+    .attr("class", "handle")
+    .attr("transform", "translate(0," + height / 2 + ")")
+    .attr("r", 9);
+
+slider
+    .call(brush.event)
+    .call(brush.extent([25, 25]))
+    .call(brush.event);
+
+function brushed() {
+  var value = brush.extent()[0];
+
+  if (d3.event.sourceEvent) { // not a programmatic event
+    value = x.invert(d3.mouse(this)[0]);
+    brush.extent([value, value]);
+  }
+
+  handle.attr("cx", x(value));
+}
+}
