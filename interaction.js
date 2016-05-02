@@ -11,9 +11,8 @@ var projection = d3.geo.mercator()
 	.translate([width / 2, height / 2]);
 
 var incidents = [];
-var location1 = [100,100];
-var location2 = [0,0];
-var mouseClick = 0; //Currently, it is hard-coded such that each odd click chooses the home, and even click chooses the work location.
+var homeLocation = [-122.490402, 37.786453];
+var workLocation = [-122.389809, 37.72728];
 var selectRadius = 0.05; //Currently I hard-coded the radius just to test out functionality
 
 var options = {
@@ -61,12 +60,13 @@ var drag = d3.behavior.drag()
 
 function dragmove(d) {
 	d3.select(this).attr("cx", d.x = d3.event.x).attr("cy", d.y = d3.event.y);
+	console.log(d.target);
   //var x = d3.event.x;
   //var y = d3.event.y;
 }
 
 function drawHome() {
-	homeLocation = [-122.490402, 37.786453];	
+	//homeLocation = [-122.490402, 37.786453];	
 
 	var map = d3.select("svg")
 		.selectAll("circle.home")
@@ -80,10 +80,15 @@ function drawHome() {
 		.attr("fill", "blue")
 		.call(drag);
 
+
+		var homePoint = document.getElementsByClassName("home");
+		console.log(homeLocation);
+
+
 }
 
 function drawWork() {
-	workLocation = [-122.389809, 37.72728];	
+	//workLocation = [-122.389809, 37.72728];	
 
 	var map = d3.select("svg")
 		.selectAll("circle.work")
