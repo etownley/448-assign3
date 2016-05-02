@@ -169,15 +169,22 @@ function attachDayListeners() {
 		var DayOfWeek = button.value;
 		console.log(DayOfWeek);
 		if(DayOfWeek === "AllDays") { //handling the toggle on and off for all options
-			if(options.DayOfWeek.length === 7) { //if all the days are in there,
+			if(options.DayOfWeek.length === 7 || options.DayOfWeek.length === 8) { //if all the days are in there,
 				console.log("All days are in there");
 				options.DayOfWeek = [];
 				button.classList.remove("active");
+				for(var i = 0; i < buttons.length; i++) {
+					buttons[i].classList.remove("active");
+				}
+
 			} else {
-				for(var i = 0; i < buttons.length - 1; i++) {
+				for(var i = 0; i < buttons.length; i++) {
 					if(dayIndex(buttons[i]) === -1 ) {
 						options.DayOfWeek.push(buttons[i].value);
-						button.classList.add("active");
+						buttons[i].classList.add("active");
+						//for(var i = 0; i < buttons.length; i++) {
+						//	buttons[i].classList.add("active");
+						//}
 					}		
 				}
 			}
@@ -313,11 +320,16 @@ function attachResetListener() {
 	var buttons = document.getElementsByClassName("reset-btn");
 
 	var handleClick = function(e) {
+		var allButtons = document.getElementsByClassName("default-selected");
+		for (var i = 0; i < allButtons.length; i++) {
+			allButtons[i].classList.add("active");
+		}
 		options = {
 			"DayOfWeek": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
 			"TimeRange": ["Morning", "Afternoon", "Night", "Late Night"],
 			"Category": ["ARSON", "ASSAULT", "BRIBERY", "BURGLARY", "DISORDERLY CONDUCT", "DRIVING UNDER THE INFLUENCE", "DRUG/NARCOTIC", "DRUNKENNESS", "EMBEZZLEMENT", "EXTORTION", "FAMILY OFFENSES", "FORGERY/COUNTERFEITING", "FRAUD", "GAMBLING", "KIDNAPPING", "LARCENY/THEFT", "LIQUOR LAWS", "LOITERING", "MISSING PERSON", "NON-CRIMINAL", "OTHER OFFENSES", "PROSTITUTION", "ROBBERY", "RUNAWAY", "SECONDARY CODES", "SEX OFFENSES, FORCIBLE", "SEX OFFENSES, NON FORCIBLE", "STOLEN PROPERTY", "SUICIDE", "SUSPICIOUS OCC", "TRESPASS", "VANDALISM", "VEHICLE THEFT", "WARRANTS", "WEAPON LAWS"]
 		}
+		
 		filterIncidents(options);
 		drawPoints();
 	};
