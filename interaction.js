@@ -11,9 +11,9 @@ var projection = d3.geo.mercator()
 	.translate([width / 2, height / 2]); //translates origin of map to this position
 
 var incidents = [];
-var homeLocation = [-122.440402, 37.76453];
-var workLocation = [-122.409809, 37.75728];
-var selectRadius = 0.08; //Currently I hard-coded the radius just to test out functionality
+var homeLocation = [300, 300]; //reset original poin
+var workLocation = [500, 400]; //reset original point
+var selectRadius = 100; //Currently I hard-coded the radius just to test out functionality
 
 /*
 var bounds = d3.geo.bounds();
@@ -68,7 +68,7 @@ var drag = d3.behavior.drag()
     .on("drag", dragmove)
     .on("dragend", function () {
     	console.log("findNearestCrimes: " + homeLocation + workLocation + selectRadius);
-    	findNearestCrimes(homeLocation[0], homeLocation[1], workLocation[0], workLocation[1], selectRadius)
+    	findNearestCrimes(homeLocation, workLocation, selectRadius)
     });
 
 function dragmove(d) {
@@ -76,9 +76,9 @@ function dragmove(d) {
 	
 
 	var pointID = d3.select(this).attr("id");
-	var pointLocation = projection.invert(d3.select(this).attr("cx"));
+	//var pointLocation = projection.invert(d3.select(this).attr("cx"));
+	var pointLocation = [d3.select(this).attr("cx"), d3.select(this).attr("cy")];
 
-	
 
 	if(pointID === "home") {
 		homeLocation = pointLocation;
@@ -86,7 +86,7 @@ function dragmove(d) {
 		workLocation = pointLocation;
 	}
 
-	console.log(homeLocation, workLocation);
+	//console.log(homeLocation, workLocation);
 	//findNearestCrimes();
 	//drawPoints();
 
@@ -110,8 +110,8 @@ function drawHome() {
 		map.enter()
 		.append("circle")
 		.attr("id", "home")
-		.attr("cx", function(d) { return projection(d)[0] })
-		.attr("cy", function(d) { return projection(d)[1] })
+		.attr("cx", homeLocation[0])
+		.attr("cy", homeLocation[1])
 		.attr("r", "10px")
 		.attr("fill", "blue")
 		.call(drag);
@@ -144,8 +144,8 @@ function drawWork() {
 		.enter()
 		.append("circle")
 		.attr("id", "work")
-		.attr("cx", function(d) { return projection(d)[0] })
-		.attr("cy", function(d) { return projection(d)[1] })
+		.attr("cx", workLocation[0])
+		.attr("cy", workLocation[1])
 		.attr("r", "10px")
 		.attr("fill", "green")
 		.call(drag);
@@ -434,14 +434,20 @@ document.addEventListener("DOMContentLoaded", function() {
 **/
 
 
-function getDistance(x1, x2, y1, y2) {
-  	return Math.sqrt(Math.pow((x1-x2), 2) + Math.pow((y1-y2), 2));
+function getDistance(incident, point) {
+  	return Math.sqrt(Math.pow((incident[0]-point[0]), 2) + Math.pow((incident[1]-point[1]), 2));
   }
 
-function withinRadius(incident, radius, latitude, longitude) {
+function withinRadius(incident, point, radius) {
 	//fix it such that it finds the distance in XY coords, but still displays in latlong
-	var distance = getDistance(latitude, incident.Location[0], longitude, incident.Location[1]);
-	return (distance <= radius);
+	 
+	var incidentXY = projection(incident.Location);
+
+	var distance = getDistance(incidentXY, point);
+	console.log("Distance to incident: (x)" + incidentXY[0] + " (y)" + incidentXY[1] + " is " + distance);
+	return distance <= radius;
+	//var distance = getDistance(latitude, incident.Location[0], longitude, incident.Location[1]);
+	//return (distance <= radius);
 }
 
 function satisfiesOptions(incident) {
@@ -454,11 +460,11 @@ function satisfiesOptions(incident) {
 
 //Currently registers and figures out what points are within the radius, but does not render them on the screen correctly.. 
 
-function findNearestCrimes(lat1, long1, lat2, long2, radius) {
+function findNearestCrimes(home, work, radius) {
 	console.log("Finding nearest crimes");
 	incidents.forEach(function(incident, index, arr) {
 			//console.log("checking to see if " + arr[index] + " is within radius");
-			if(withinRadius(incident, radius, lat1, long1) && withinRadius(incident, radius, lat2, long2)) {
+			if(withinRadius(incident, home, radius) && withinRadius(incident, work, radius)) {
 				if(satisfiesOptions(incident)) {
 						console.log("Incident " + index + " is within radius");
 						arr[index].Selected = true;
