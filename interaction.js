@@ -8,12 +8,19 @@ var width = 750,
 var projection = d3.geo.mercator()
 	.center([-122.433701, 37.767683]) // San Francisco, roughly
 	.scale(225000)
-	.translate([width / 2, height / 2]);
+	.translate([width / 2, height / 2]); //translates origin of map to this position
 
 var incidents = [];
-var homeLocation = [-122.490402, 37.786453];
-var workLocation = [-122.389809, 37.72728];
-var selectRadius = 0.05; //Currently I hard-coded the radius just to test out functionality
+var homeLocation = [-122.440402, 37.76453];
+var workLocation = [-122.409809, 37.75728];
+var selectRadius = 0.08; //Currently I hard-coded the radius just to test out functionality
+
+/*
+var bounds = d3.geo.bounds();
+
+function convertPixelsToGeo(x, y) {
+	var lat = 
+}*/
 
 var options = {
 	"DayOfWeek": ["Sunday", "Monday", "Tuesday","Wednesday", "Thursday", "Friday", "Saturday"],
@@ -25,6 +32,8 @@ var options = {
 var svg = d3.select("#map").append("svg")
 	.attr("width", width)
 	.attr("height", height);
+
+
 
 // Add svg map at correct size, assumes map is saved in a subdirectory called "data"
 svg.append("image")
@@ -48,7 +57,7 @@ function drawPoints(drawAll) {
 		.filter(function(d) { return d.Selected })
 		.attr("class", "incident")
 		.attr("cx", function(d) { return projection(d.Location)[0] })
-		.attr("cy", function(d) { return projection(d.Location)[1] })
+		.attr("cy", function(d) { return projection(d.Location)[1] }) //look at inverse projection
 		.attr("r", "2px")
 		.attr("fill", "rgba(255, 0, 0, 0.3)");
 
@@ -56,13 +65,39 @@ function drawPoints(drawAll) {
 }
 
 var drag = d3.behavior.drag()
-    .on("drag", dragmove);
+    .on("drag", dragmove)
+    .on("dragend", function () {
+    	console.log("findNearestCrimes: " + homeLocation + workLocation + selectRadius);
+    	findNearestCrimes(homeLocation[0], homeLocation[1], workLocation[0], workLocation[1], selectRadius)
+    });
 
 function dragmove(d) {
 	d3.select(this).attr("cx", d.x = d3.event.x).attr("cy", d.y = d3.event.y);
-	console.log(d.target);
+	
+
+	var pointID = d3.select(this).attr("id");
+	var pointLocation = projection.invert(d3.select(this).attr("cx"));
+
+	
+
+	if(pointID === "home") {
+		homeLocation = pointLocation;
+	} else {
+		workLocation = pointLocation;
+	}
+
+	console.log(homeLocation, workLocation);
+	//findNearestCrimes();
+	//drawPoints();
+
+	//svg masks
+	//call when drag end 
+	//throttle
+
+
   //var x = d3.event.x;
   //var y = d3.event.y;
+  //attr 
 }
 
 function drawHome() {
@@ -70,19 +105,32 @@ function drawHome() {
 
 	var map = d3.select("svg")
 		.selectAll("circle.home")
-		.data([homeLocation])
-		.enter()
+		.data([homeLocation]);
+		
+		map.enter()
 		.append("circle")
-		.attr("class", "home")
+		.attr("id", "home")
 		.attr("cx", function(d) { return projection(d)[0] })
 		.attr("cy", function(d) { return projection(d)[1] })
 		.attr("r", "10px")
 		.attr("fill", "blue")
 		.call(drag);
 
+		/*
+		map.enter()
+		.append("circle")
+		.attr("id", "homeRadius")
+		.attr("cx1", function(d) {return projection(d)[0]})
+		.attr("cy2", function(d) { return projection(d)[1] })
+		.attr("r", "30px")
+		.attr("fill", "none")
+		.attr("stroke", "blue")
+		.attr("stroke-width", "6px");*/
+		
 
 		var homePoint = document.getElementsByClassName("home");
-		console.log(homeLocation);
+
+			
 
 
 }
@@ -95,7 +143,7 @@ function drawWork() {
 		.data([workLocation])
 		.enter()
 		.append("circle")
-		.attr("class", "work")
+		.attr("id", "work")
 		.attr("cx", function(d) { return projection(d)[0] })
 		.attr("cy", function(d) { return projection(d)[1] })
 		.attr("r", "10px")
@@ -385,24 +433,21 @@ document.addEventListener("DOMContentLoaded", function() {
 	---------- Adding home and work location on the map ----------
 **/
 
-function withinRadius(incident, radius, latitude, longitude) {
-	var latDiff = latitude - incident.Location[0];
-	var longDiff = longitude - incident.Location[1];
-	var distance = Math.sqrt(latDiff*latDiff + longDiff*longDiff); 
-	return (distance <= radius);
-}
 
-//if location is reset, set lat and long back to 0. A location point is reset or not. 
-function isLegit(latitude, longitude) { 
-	console.log(latitude + ", " + longitude + " is legit or not");
-	return (latitude !== 0 && longitude !== 0); 
+function getDistance(x1, x2, y1, y2) {
+  	return Math.sqrt(Math.pow((x1-x2), 2) + Math.pow((y1-y2), 2));
+  }
+
+function withinRadius(incident, radius, latitude, longitude) {
+	//fix it such that it finds the distance in XY coords, but still displays in latlong
+	var distance = getDistance(latitude, incident.Location[0], longitude, incident.Location[1]);
+	return (distance <= radius);
 }
 
 function satisfiesOptions(incident) {
 	var dayIndex = options.DayOfWeek.indexOf(incident.DayOfWeek);
 	var timeIndex = options.TimeRange.indexOf(incident.TimeRange);
 	var categoryIndex = options.Category.indexOf(incident.Category);
-	console.log(dayIndex, timeIndex, categoryIndex);
 	return (dayIndex > -1 && timeIndex > -1 && categoryIndex > -1);
 
 }
@@ -410,44 +455,23 @@ function satisfiesOptions(incident) {
 //Currently registers and figures out what points are within the radius, but does not render them on the screen correctly.. 
 
 function findNearestCrimes(lat1, long1, lat2, long2, radius) {
-	if(isLegit(lat1,long1) && isLegit(lat2,long2)) {
-		console.log("Both points legit");
-		incidents.forEach(function(incident, index, arr) {
+	console.log("Finding nearest crimes");
+	incidents.forEach(function(incident, index, arr) {
 			//console.log("checking to see if " + arr[index] + " is within radius");
 			if(withinRadius(incident, radius, lat1, long1) && withinRadius(incident, radius, lat2, long2)) {
 				if(satisfiesOptions(incident)) {
 						console.log("Incident " + index + " is within radius");
 						arr[index].Selected = true;
+				} else {
+					console.log("Incident " + index + " is within radius but does not satisfy options");
 				}
-				console.log("Incident " + index + " is within radius but does not satisfy options");
+				
 			} else {
 				console.log("Incident " + index + " is not within radius");
 				arr[index].Selected = false;
 			}
-		});
-	} else if (isLegit(lat1,long1) && !isLegit(lat2,long2)) {
-		console.log("Only first point legit");
-		incidents.forEach(function(incident, index, arr) {
-			if(withinRadius(incident, radius, lat1, long1)) {
-				if(satisfiesOptions(incident)) {
-					arr[index].Selected = true;
-				}
-			} else {
-				arr[index].Selected = false;
-			}
-		});
-	} else if (!isLegit(lat1,long1) && isLegit(lat2,long2)) {
-		console.log("Only second point legit");
-		incidents.forEach(function(incident, index, arr) {
-			if(withinRadius(incident, radius, lat2, long2)) {
-				if(satisfiesOptions(incident)) {
-					arr[index].Selected = true;
-				}
-			} else {
-				arr[index].Selected = false;
-			}
-		});
-	}
+	});
+
 	drawPoints();
 }
 
