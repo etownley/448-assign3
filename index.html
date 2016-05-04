@@ -50,12 +50,13 @@
 	<div id = "maptitle">San Francisco Crime</div>
 	<div id = "mapsubtitle">April 1-15, 2016</div>
 	<div id="sidebar" class = 'button-wrapper'>
+		<h5>Radius selector (choose value from 10-1000)</h5>
 		<div id="input">
-			Radius for Home: <input type="text" id="homeR" onkeydown="testspecialname(this)" />
+			Radius for Home (Blue): <input type="text" id="homeR" oninput="testspecialname(this)" /> px 
 		</div>
-	<div id="input">
-		Radius for Work: <input type="text" id="workR" onkeydown="testspecialname(this)" />
-	</div>
+		<div id="input">
+			Radius for Work (Green): <input type="text" id="workR" oninput="testspecialname(this)" /> px
+		</div>
 
 		<!--<button class="selection-btn btn btn-primary home-btn" value="Home">Select home location</button>
 		<p style = "padding-top: 10px;">

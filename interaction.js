@@ -13,16 +13,13 @@ var projection = d3.geo.mercator()
 var incidents = [];
 var homeLocation = [-122.433701, 37.787683]; //reset original point
 var workLocation = [-122.433701, 37.767683]; //reset original point
-var homeRadius = 3;
-var workRadius = 3;
+var homeRadius = 200;
+var workRadius = 200;
 var selectRadius = 100; //Currently I hard-coded the radius just to test out functionality
 
-/*
-var bounds = d3.geo.bounds();
 
-function convertPixelsToGeo(x, y) {
-	var lat = 
-}*/
+
+
 
 var options = {
 	"DayOfWeek": ["Sunday", "Monday", "Tuesday","Wednesday", "Thursday", "Friday", "Saturday"],
@@ -42,6 +39,10 @@ svg.append("image")
 	.attr("width", width)
 	.attr("height", height)
 	.attr("xlink:href", "data/sf-map.svg");
+
+
+document.getElementById("homeR").defaultValue = homeRadius;
+document.getElementById("workR").defaultValue = workRadius;
 
 // -------------- LINK ARRAY OF INCIDENTS TO DOM ELEMENTS ---------------
 function drawPoints() {
@@ -137,6 +138,8 @@ function dragmove(d) {
   //attr 
 }
 
+
+
 function drawHome() {
 	//homeLocation = [-122.490402, 37.786453];	
 
@@ -154,18 +157,21 @@ function drawHome() {
 		.call(drag);
 
 		/*
+
 		map.enter()
 		.append("circle")
 		.attr("id", "homeRadius")
-		.attr("cx1", function(d) {return projection(d)[0]})
-		.attr("cy2", function(d) { return projection(d)[1] })
-		.attr("r", "30px")
+		.attr("cx", projection(homeLocation)[0])
+		.attr("cy", projection(homeLocation)[1])
+		.attr("r", homeRadius)
 		.attr("fill", "none")
 		.attr("stroke", "blue")
-		.attr("stroke-width", "6px");*/
+		.attr("stroke-width", "2px")
+		.call(drag);*/
+		
 		
 
-		var homePoint = document.getElementsByClassName("home");
+		//var homePoint = document.getElementsByClassName("home");
 
 			
 
@@ -177,8 +183,9 @@ function drawWork() {
 
 	var map = d3.select("svg")
 		.selectAll("circle.work")
-		.data([workLocation])
-		.enter()
+		.data([workLocation]);
+
+		map.enter()
 		.append("circle")
 		.attr("id", "work")
 		.attr("cx", projection(workLocation)[0])
@@ -186,6 +193,18 @@ function drawWork() {
 		.attr("r", "10px")
 		.attr("fill", "green")
 		.call(drag);
+
+		/*
+		map.enter()
+		.append("circle")
+		.attr("id", "workRadius")
+		.attr("cx", projection(workLocation)[0])
+		.attr("cy", projection(workLocation)[1])
+		.attr("r", workRadius)
+		.attr("fill", "none")
+		.attr("stroke", "green")
+		.attr("stroke-width", "2px")
+		.call(drag);*/
 
 }
 
@@ -213,8 +232,8 @@ function convertTimeToRange(time) {
  */
 function filterIncidents(options) {
 	incidents.forEach(function(incident, index, arr) {
-		if ( !withinRadius(incident, homeLocation, homeRadius, homeRadius/100) ||
-			 !withinRadius(incident, workLocation, workRadius, workRadius/100)) {
+		if ( !withinRadius(incident, homeLocation, homeRadius) ||
+			 !withinRadius(incident, workLocation, workRadius)) {
 			arr[index].Selected = false;
 			return;
 		}
@@ -276,6 +295,8 @@ d3.json("scpd_incidents.json", function(error, scpd_incidents) {
 	drawPoints();
 	drawHome();
 	drawWork();
+
+
 
 	var buttons = document.getElementsByClassName("default-selected");
 	for(var i = 0; i < buttons.length; i++) {
@@ -507,24 +528,24 @@ function getDistance(incident, point) {
   	// return Math.sqrt(Math.pow((incident[0]-point[0]), 2) + Math.pow((incident[1]-point[1]), 2));
   }
 
-function withinRadius(incident, point, radius, conversion) {
+function withinRadius(incident, point, radius) {
 	// incident is in lat/long, point is in pixels, radius is in ??? (pixels)
 
 	// console.log(incident.Location, point, radius);
+	var incidentXY = projection(incident.Location);
+	var pointXY = projection(point);
+	//var incidentXY = incident.Location.map(function(i) { return parseFloat(i); });
+	//var pointXY = point.map(function(i) { return parseFloat(i); });
 
-	var incidentXY = incident.Location.map(function(i) { return parseFloat(i); });
-	var pointXY = point.map(function(i) { return parseFloat(i); });
-
-	//fix it such that it finds the distance in XY coords, but still displays in latlong
-
-	// console.log(incidentXY, point);
-	var distance = getDistance(incidentXY, point);
+	
+	//console.log(incidentXY, pointXY);
+	var distance = getDistance(incidentXY, pointXY);
 	//console.log("Distance to incident: (x)" + incidentXY[0] + " (y)" + incidentXY[1] + " is " + distance);
 
 	// console.log(point);
 
 	// console.log(distance);
-	return distance <= conversion;
+	return distance <= radius;
 	//var distance = getDistance(latitude, incident.Location[0], longitude, incident.Location[1]);
 	//return (distance <= radius);
 }
