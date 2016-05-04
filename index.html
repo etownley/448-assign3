@@ -2,22 +2,41 @@
 <meta charset="utf-8">
 <head>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	<link rel="stylesheet" href="./lib/nouislider.min.css">
+	<link rel="stylesheet" href="./lib/nouislider.pips.css">
+	<link rel="stylesheet" href="./lib/nouislider.tooltips.css">
 	<style>
 
 	/* CSS goes here. */
 		#sidebar {
-			background-color: rgba(144, 144, 144, 0.6);
+			background-color: rgba(149, 237, 229, 0.2);
 			float: right;
 			padding: 20px;
 			position: absolute;
 			width: 40%;
 			top: 50px;
-			right: 100px;
+			right: 120px;
 		}
 
 		#input{
 			padding-top: 10px;
 			padding-bottom: 5px;
+		}
+
+		#homecircle {
+    		background: #DB504A;
+    		display: inline-block;
+    		width: 24px;
+    		height: 24px;
+    		border-radius: 50%;
+		}
+
+		#workcircle {
+    		background: #084C61;
+    		display: inline-block;
+    		width: 24px;
+    		height: 24px;
+    		border-radius: 50%;
 		}
 
 		.button-wrapper .btn {
@@ -33,6 +52,7 @@
 			position: absolute;
 			top: 50px;
 			left: 50px;
+			color: #2A2B2A;
 		}
 
 		#mapsubtitle {
@@ -43,86 +63,109 @@
 			color: #8A8A8A;
 		}
 
+		#filtertitle {
+			font-size: 20px;
+			color: #2A2B2A;
+			padding-top: 10px;
+			padding-bottom: 10px;
+		}
+
+		#slider-labels {
+			display: inline-block;
+			width: 300px;
+		}
+
+
 	</style>
 </head>
 <body>
 	<div id="map"></div>
-	<div id = "maptitle">San Francisco Crime</div>
-	<div id = "mapsubtitle">April 1-15, 2016</div>
+	<div id = "maptitle">San Francisco Crime Data</div>
+	<div id = "mapsubtitle">Reported April 1-15, 2016</div>
 	<div id="sidebar" class = 'button-wrapper'>
+<<<<<<< HEAD
 		<h5>Radius selector (choose value from 10-1000)</h5>
 		<div id="input">
 			Radius for Home (Blue): <input type="text" id="homeR" oninput="testspecialname(this)" /> px 
 		</div>
 		<div id="input">
 			Radius for Work (Green): <input type="text" id="workR" oninput="testspecialname(this)" /> px
+=======
+		<div>
+			<div id="filtertitle">Home Location <span id="homecircle"></span></div>
+			<div>Radius from Home (0-7 miles)</div>
+			<div id="home-slider" style="width: 300px; margin: 10px 0px;"></div>
+			<div id="filtertitle">Work Location <span id="workcircle"></span></div>
+			<div>Radius from Work (0-7 miles)</div>
+			<div id="work-slider" style="width: 300px; margin: 10px 0px;"></div>
+>>>>>>> a246ecb7ce6e4265d3d6f34acdc71f10bbb262a7
 		</div>
 
 		<!--<button class="selection-btn btn btn-primary home-btn" value="Home">Select home location</button>
 		<p style = "padding-top: 10px;">
 		<button class="selection-btn btn btn-primary work-btn" value="Work">Select work location</button>-->
-		<h5>Day of Week</h5> 
+		<div id="filtertitle">Day of Week</div>
 		<div id = "dayButtons">
-			<button class="day-btn btn btn-primary default-selected" value="Monday">Monday</button>
-			<button class="day-btn btn btn-primary default-selected" value="Tuesday">Tuesday</button>
-			<button class="day-btn btn btn-primary default-selected" value="Wednesday">Wednesday</button>
-			<button class="day-btn btn btn-primary default-selected" value="Thursday">Thursday</button>
-			<button class="day-btn btn btn-primary default-selected" value="Friday">Friday</button>
-			<button class="day-btn btn btn-primary default-selected" value="Saturday">Saturday</button>
-			<button class="day-btn btn btn-primary default-selected" value="Sunday">Sunday</button>
+			<button class="day-btn btn btn-primary default-selected active" value="Monday">Monday</button>
+			<button class="day-btn btn btn-primary default-selected active" value="Tuesday">Tuesday</button>
+			<button class="day-btn btn btn-primary default-selected active" value="Wednesday">Wednesday</button>
+			<button class="day-btn btn btn-primary default-selected active" value="Thursday">Thursday</button>
+			<button class="day-btn btn btn-primary default-selected active" value="Friday">Friday</button>
+			<button class="day-btn btn btn-primary default-selected active" value="Saturday">Saturday</button>
+			<button class="day-btn btn btn-primary default-selected active" value="Sunday">Sunday</button>
 			<div id = "dayButtonOptions">
-				<button class="day-btn btn btn-primary" id = "AllDays" value="AllDays">Select All</button>
-				<button class="day-btn btn btn-primary" id = "NotAllDays" value="NotAllDays">Deselect All</button>
+				<button class="day-btn btn btn-primary all" id = "AllDays" value="AllDays">Select All</button>
+				<button class="day-btn btn btn-primary all" id = "NotAllDays" value="NotAllDays">Deselect All</button>
 			</div>
 		</div>
-		<h5>Time of Day</h5>
+		<div id="filtertitle">Time of Day</div>
 		<div id = "timeButtons">
-			<button class="time-btn btn btn-primary default-selected" value="Morning">Morning (06:00am - 12:00pm)</button>
-			<button class="time-btn btn btn-primary default-selected" value="Afternoon">Afternoon (12:00pm - 06:00pm)</button>
-			<button class="time-btn btn btn-primary default-selected" value="Night">Night (06:00pm - 12:00am)</button>
-			<button class="time-btn btn btn-primary default-selected" value="Late Night"> Late Night (12:00am - 06:00am)</button>
+			<button class="time-btn btn btn-primary default-selected active" value="Morning">Morning (06:00am - 12:00pm)</button>
+			<button class="time-btn btn btn-primary default-selected active" value="Afternoon">Afternoon (12:00pm - 06:00pm)</button>
+			<button class="time-btn btn btn-primary default-selected active" value="Night">Night (06:00pm - 12:00am)</button>
+			<button class="time-btn btn btn-primary default-selected active" value="Late Night"> Late Night (12:00am - 06:00am)</button>
 			<div id = "timeButtonOptions">
 				<button class="time-btn btn btn-primary" value="AllTimes">Select All</button>
 				<button class="time-btn btn btn-primary" value="NotAllTimes">Deselect All</button>
 			</div>
 		</div>
-		<h5>Category</h5>
+		<div id="filtertitle">Category</div>
 		<div id = "categoryButtons">
-			<button class="category-btn btn btn-primary default-selected" value="ARSON">Arson</button>
-			<button class="category-btn btn btn-primary default-selected" value="ASSAULT">Assault</button>
-			<button class="category-btn btn btn-primary default-selected" value="BRIBERY">Bribery</button>
-			<button class="category-btn btn btn-primary default-selected" value="BURGLARY">Burglary</button>
-			<button class="category-btn btn btn-primary default-selected" value="DISORDERLY CONDUCT">Disorderly Conduct</button>
-			<button class="category-btn btn btn-primary default-selected" value="DRIVING UNDER THE INFLUENCE">DUI</button>
-			<button class="category-btn btn btn-primary default-selected" value="DRUG/NARCOTIC">Drug/Narcotic</button>
-			<button class="category-btn btn btn-primary default-selected" value="DRUNKENNESS">Drunkenness</button>
-			<button class="category-btn btn btn-primary default-selected" value="EMBEZZLEMENT">Embezzlement</button>
-			<button class="category-btn btn btn-primary default-selected" value="EXTORTION">Extortion</button>
-			<button class="category-btn btn btn-primary default-selected" value="FAMILY OFFENSES">Family Offenses</button>
-			<button class="category-btn btn btn-primary default-selected" value="FORGERY/COUNTERFEITING">Forgery/Counterfeiting</button>
-			<button class="category-btn btn btn-primary default-selected" value="FRAUD">Fraud</button>
-			<button class="category-btn btn btn-primary default-selected" value="GAMBLING">Gambling</button>
-			<button class="category-btn btn btn-primary default-selected" value="KIDNAPPING">Kidnapping</button>
-			<button class="category-btn btn btn-primary default-selected" value="LARCENY/THEFT">Larceny/Theft</button>
-			<button class="category-btn btn btn-primary default-selected" value="LIQUOR LAWS">Liquor Laws</button>
-			<button class="category-btn btn btn-primary default-selected" value="LOITERING">Loitering</button>
-			<button class="category-btn btn btn-primary default-selected" value="MISSING PERSON">Missing Person</button>
-			<button class="category-btn btn btn-primary default-selected" value="NON-CRIMINAL">Non-criminal</button>
-			<button class="category-btn btn btn-primary default-selected" value="OTHER OFFENSES">Other Offenses</button>
-			<button class="category-btn btn btn-primary default-selected" value="PROSTITUTION">Prostitution</button>
-			<button class="category-btn btn btn-primary default-selected" value="ROBBERY">Robbery</button>
-			<button class="category-btn btn btn-primary default-selected" value="RUNAWAY">Runaway</button>
-			<button class="category-btn btn btn-primary default-selected" value="SECONDARY CODES">Secondary Codes</button>
-			<button class="category-btn btn btn-primary default-selected" value="SEX OFFENSES, FORCIBLE">Sex Offenses, Forcible</button>
-			<button class="category-btn btn btn-primary default-selected" value="SEX OFFENSES, NON FORCIBLE">Sex Offenses, Non Forcible</button>
-			<button class="category-btn btn btn-primary default-selected" value="STOLEN PROPERTY">Stolen Property</button>
-			<button class="category-btn btn btn-primary default-selected" value="SUICIDE">Suicide</button>
-			<button class="category-btn btn btn-primary default-selected" value="SUSPICIOUS OCC">Suspicious Occ</button>
-			<button class="category-btn btn btn-primary default-selected" value="TRESPASS">Trespass</button>
-			<button class="category-btn btn btn-primary default-selected" value="VANDALISM">Vandalism</button>
-			<button class="category-btn btn btn-primary default-selected" value="VEHICLE THEFT">Vehicle Theft</button>
-			<button class="category-btn btn btn-primary default-selected" value="WARRANTS">Warrants</button>
-			<button class="category-btn btn btn-primary default-selected" value="WEAPON LAWS">Weapon Laws</button>
+			<button class="category-btn btn btn-primary default-selected active" value="ARSON">Arson</button>
+			<button class="category-btn btn btn-primary default-selected active" value="ASSAULT">Assault</button>
+			<button class="category-btn btn btn-primary default-selected active" value="BRIBERY">Bribery</button>
+			<button class="category-btn btn btn-primary default-selected active" value="BURGLARY">Burglary</button>
+			<button class="category-btn btn btn-primary default-selected active" value="DISORDERLY CONDUCT">Disorderly Conduct</button>
+			<button class="category-btn btn btn-primary default-selected active" value="DRIVING UNDER THE INFLUENCE">DUI</button>
+			<button class="category-btn btn btn-primary default-selected active" value="DRUG/NARCOTIC">Drug/Narcotic</button>
+			<button class="category-btn btn btn-primary default-selected active" value="DRUNKENNESS">Drunkenness</button>
+			<button class="category-btn btn btn-primary default-selected active" value="EMBEZZLEMENT">Embezzlement</button>
+			<button class="category-btn btn btn-primary default-selected active" value="EXTORTION">Extortion</button>
+			<button class="category-btn btn btn-primary default-selected active" value="FAMILY OFFENSES">Family Offenses</button>
+			<button class="category-btn btn btn-primary default-selected active" value="FORGERY/COUNTERFEITING">Forgery/Counterfeiting</button>
+			<button class="category-btn btn btn-primary default-selected active" value="FRAUD">Fraud</button>
+			<button class="category-btn btn btn-primary default-selected active" value="GAMBLING">Gambling</button>
+			<button class="category-btn btn btn-primary default-selected active" value="KIDNAPPING">Kidnapping</button>
+			<button class="category-btn btn btn-primary default-selected active" value="LARCENY/THEFT">Larceny/Theft</button>
+			<button class="category-btn btn btn-primary default-selected active" value="LIQUOR LAWS">Liquor Laws</button>
+			<button class="category-btn btn btn-primary default-selected active" value="LOITERING">Loitering</button>
+			<button class="category-btn btn btn-primary default-selected active" value="MISSING PERSON">Missing Person</button>
+			<button class="category-btn btn btn-primary default-selected active" value="NON-CRIMINAL">Non-criminal</button>
+			<button class="category-btn btn btn-primary default-selected active" value="OTHER OFFENSES">Other Offenses</button>
+			<button class="category-btn btn btn-primary default-selected active" value="PROSTITUTION">Prostitution</button>
+			<button class="category-btn btn btn-primary default-selected active" value="ROBBERY">Robbery</button>
+			<button class="category-btn btn btn-primary default-selected active" value="RUNAWAY">Runaway</button>
+			<button class="category-btn btn btn-primary default-selected active" value="SECONDARY CODES">Secondary Codes</button>
+			<button class="category-btn btn btn-primary default-selected active" value="SEX OFFENSES, FORCIBLE">Sex Offenses, Forcible</button>
+			<button class="category-btn btn btn-primary default-selected active" value="SEX OFFENSES, NON FORCIBLE">Sex Offenses, Non Forcible</button>
+			<button class="category-btn btn btn-primary default-selected active" value="STOLEN PROPERTY">Stolen Property</button>
+			<button class="category-btn btn btn-primary default-selected active" value="SUICIDE">Suicide</button>
+			<button class="category-btn btn btn-primary default-selected active" value="SUSPICIOUS OCC">Suspicious Occ</button>
+			<button class="category-btn btn btn-primary default-selected active" value="TRESPASS">Trespass</button>
+			<button class="category-btn btn btn-primary default-selected active" value="VANDALISM">Vandalism</button>
+			<button class="category-btn btn btn-primary default-selected active" value="VEHICLE THEFT">Vehicle Theft</button>
+			<button class="category-btn btn btn-primary default-selected active" value="WARRANTS">Warrants</button>
+			<button class="category-btn btn btn-primary default-selected active" value="WEAPON LAWS">Weapon Laws</button>
 			<div id = "categoryButtonOptions">
 				<button class="category-btn btn btn-primary" value="AllCategories">Select All</button>
 				<button class="category-btn btn btn-primary" value="NotAllCategories">Deselect All</button>
@@ -133,6 +176,8 @@
 	</div>
 	<script src="lib/d3.js" charset="utf-8"></script>
 	<script src="lib/jquery.min.js" charset="utf-8"></script>
+	<script src="lib/nouislider.min.js" charset="utf-8"></script>
+
 	<script src="interaction.js"></script>
 </body>
 </html>

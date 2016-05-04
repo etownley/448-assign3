@@ -22,7 +22,9 @@ http://stackoverflow.com/questions/19655189/javascript-click-event-listener-on-c
 https://jsfiddle.net/mdml/da37B/
 https://bl.ocks.org/mbostock/6123708
 
-* Modified Mike Bostock's tutorial on making a slider
-https://bl.ocks.org/mbostock/6452972
+* Used NoUISlider to make the sliders for adjusting the radii
+http://refreshless.com/nouislider/pips/
+
+
 
 
