@@ -13,19 +13,9 @@ var projection = d3.geo.mercator()
 var incidents = [];
 var homeLocation = [-122.433701, 37.787683]; //reset original point
 var workLocation = [-122.433701, 37.767683]; //reset original point
-<<<<<<< HEAD
-var homeRadius = 200;
-var workRadius = 200;
-var selectRadius = 100; //Currently I hard-coded the radius just to test out functionality
+var homeRadius = 500;
+var workRadius = 500;
 
-
-
-
-=======
-var homeRadius = 3;
-var workRadius = 3;
-
->>>>>>> a246ecb7ce6e4265d3d6f34acdc71f10bbb262a7
 
 // ------ All options are selected in default state to let user see all data
 var options = {
@@ -45,10 +35,6 @@ svg.append("image")
 	.attr("width", width)
 	.attr("height", height)
 	.attr("xlink:href", "data/sf-map.svg");
-
-
-document.getElementById("homeR").defaultValue = homeRadius;
-document.getElementById("workR").defaultValue = workRadius;
 
 // -------------- LINK ARRAY OF INCIDENTS TO DOM ELEMENTS ---------------
 function drawPoints() {
@@ -105,8 +91,6 @@ function dragmove(d) {
 
 }
 
-
-
 function drawHome() {
 	//homeLocation = [-122.490402, 37.786453];	
 
@@ -123,26 +107,7 @@ function drawHome() {
 		.attr("fill", "#DB504A")
 		.call(drag);
 
-<<<<<<< HEAD
-		/*
-
-		map.enter()
-		.append("circle")
-		.attr("id", "homeRadius")
-		.attr("cx", projection(homeLocation)[0])
-		.attr("cy", projection(homeLocation)[1])
-		.attr("r", homeRadius)
-		.attr("fill", "none")
-		.attr("stroke", "blue")
-		.attr("stroke-width", "2px")
-		.call(drag);*/
-		
-		
-
-		//var homePoint = document.getElementsByClassName("home");
-=======
 		var homePoint = document.getElementsByClassName("home");
->>>>>>> a246ecb7ce6e4265d3d6f34acdc71f10bbb262a7
 
 		map.exit().remove();
 
@@ -164,21 +129,7 @@ function drawWork() {
 		.attr("fill", "#084C61")
 		.call(drag);
 
-<<<<<<< HEAD
-		/*
-		map.enter()
-		.append("circle")
-		.attr("id", "workRadius")
-		.attr("cx", projection(workLocation)[0])
-		.attr("cy", projection(workLocation)[1])
-		.attr("r", workRadius)
-		.attr("fill", "none")
-		.attr("stroke", "green")
-		.attr("stroke-width", "2px")
-		.call(drag);*/
-=======
 		map.exit().remove();
->>>>>>> a246ecb7ce6e4265d3d6f34acdc71f10bbb262a7
 
 }
 
@@ -249,8 +200,6 @@ d3.json("scpd_incidents.json", function(error, scpd_incidents) {
 	drawPoints();
 	drawHome();
 	drawWork();
-
-
 
 	var buttons = document.getElementsByClassName("default-selected");
 	for(var i = 0; i < buttons.length; i++) {
@@ -435,10 +384,10 @@ document.addEventListener("DOMContentLoaded", function() {
 function initializeSliders() {
 	var sliderOptions = {
 		connect: "lower",
-		start: [90],
+		start: [200],
 		range: {
 			"min": [0],
-			"max": [100],
+			"max": [800],
 		}
 	};
 
@@ -446,7 +395,7 @@ function initializeSliders() {
 	var homeSlider = document.getElementById("home-slider");
 	noUiSlider.create(homeSlider, sliderOptions);
 	homeSlider.noUiSlider.on("update", function(value) {
-		homeRadius = parseFloat(value[0]) / 10;
+		homeRadius = parseFloat(value[0]);
 		filterIncidents(options);
 		drawPoints();
 	});
@@ -454,7 +403,7 @@ function initializeSliders() {
 	var workSlider = document.getElementById("work-slider");
 	noUiSlider.create(workSlider, sliderOptions);
 	workSlider.noUiSlider.on("update", function(value) {
-		workRadius = parseFloat(value[0]) / 10;
+		workRadius = parseFloat(value[0]);
 		filterIncidents(options);
 		drawPoints();
 	});
@@ -468,42 +417,17 @@ function initializeSliders() {
 function getDistance(incident, point) {
 	var xDistance = incident[0] - point[0];
 	var yDistance = incident[1] - point[1];
-
 	return Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2));
 
   }
 
-<<<<<<< HEAD
 function withinRadius(incident, point, radius) {
-	// incident is in lat/long, point is in pixels, radius is in ??? (pixels)
 
-	// console.log(incident.Location, point, radius);
 	var incidentXY = projection(incident.Location);
 	var pointXY = projection(point);
-	//var incidentXY = incident.Location.map(function(i) { return parseFloat(i); });
-	//var pointXY = point.map(function(i) { return parseFloat(i); });
-
-	
-	//console.log(incidentXY, pointXY);
 	var distance = getDistance(incidentXY, pointXY);
-	//console.log("Distance to incident: (x)" + incidentXY[0] + " (y)" + incidentXY[1] + " is " + distance);
-
-	// console.log(point);
-
-	// console.log(distance);
+	
 	return distance <= radius;
-	//var distance = getDistance(latitude, incident.Location[0], longitude, incident.Location[1]);
-	//return (distance <= radius);
-=======
-function withinRadius(incident, point, radius, conversion) {
-
-	var incidentXY = incident.Location.map(function(i) { return parseFloat(i); });
-	var pointXY = point.map(function(i) { return parseFloat(i); });
-
-	var distance = getDistance(incidentXY, point);
-
-	return distance <= conversion;
->>>>>>> a246ecb7ce6e4265d3d6f34acdc71f10bbb262a7
 }
 
 
