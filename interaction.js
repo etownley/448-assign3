@@ -64,11 +64,35 @@ function drawPoints(drawAll) {
 	map.exit().remove();
 }
 
+/*function drawPointsR() {
+
+	var filteredIncidents = incidentsR.filter(function(incident) {
+		return incident.Selected;
+	});
+
+	var map = d3.select("svg")
+		.selectAll("circle.incident")
+		.data(filteredIncidents);
+
+	map.enter()
+		.append("circle")
+		.filter(function(d) { return d.Selected })
+		.attr("class", "incident")
+		.attr("cx", function(d) { return projection(d.Location)[0] })
+		.attr("cy", function(d) { return projection(d.Location)[1] }) //look at inverse projection
+		.attr("r", "2px")
+		.attr("fill", "rgba(255, 0, 0, 0.3)");
+
+	map.exit().remove();
+}*/
+
 var drag = d3.behavior.drag()
     .on("drag", dragmove)
     .on("dragend", function () {
-    	console.log("findNearestCrimes: " + homeLocation + workLocation + selectRadius);
-    	findNearestCrimes(homeLocation, workLocation, selectRadius)
+    	filterIncidents(options);
+    	drawPoints();
+    	//console.log("findNearestCrimes: " + homeLocation + workLocation + selectRadius);
+    	//findNearestCrimes(homeLocation, workLocation, selectRadius)
     });
 
 function dragmove(d) {
@@ -174,6 +198,12 @@ function convertTimeToRange(time) {
  */
 function filterIncidents(options) {
 	incidents.forEach(function(incident, index, arr) {
+
+		if(!withinRadius(incident, homeLocation, selectRadius) || !withinRadius(incident, workLocation, selectRadius)) {
+			arr[index].Selected = false;
+			return;
+		}
+
 		if (options.DayOfWeek.indexOf(incident.DayOfWeek) < 0) {
 			arr[index].Selected = false;
 			return;
@@ -192,6 +222,27 @@ function filterIncidents(options) {
 		arr[index].Selected = true;
 	});
 }
+
+/*function filterIncidentsR(options, radiusIncidents) {
+	radiusIncidents.forEach(function(incident, index, arr) {
+		if (options.DayOfWeek.indexOf(incident.DayOfWeek) < 0) {
+			arr[index].Selected = false;
+			return;
+		}
+
+		if (options.Category.indexOf(incident.Category) < 0) {
+			arr[index].Selected = false;
+			return;
+		}
+
+		if (options.TimeRange.indexOf(incident.TimeRange) < 0) {
+			arr[index].Selected = false;
+			return;
+		}
+
+		arr[index].Selected = true;
+	});
+}*/
 
 function emptyOptions() {
 	options.DayOfWeek = [];
@@ -444,7 +495,7 @@ function withinRadius(incident, point, radius) {
 	var incidentXY = projection(incident.Location);
 
 	var distance = getDistance(incidentXY, point);
-	console.log("Distance to incident: (x)" + incidentXY[0] + " (y)" + incidentXY[1] + " is " + distance);
+	//console.log("Distance to incident: (x)" + incidentXY[0] + " (y)" + incidentXY[1] + " is " + distance);
 	return distance <= radius;
 	//var distance = getDistance(latitude, incident.Location[0], longitude, incident.Location[1]);
 	//return (distance <= radius);
@@ -460,25 +511,31 @@ function satisfiesOptions(incident) {
 
 //Currently registers and figures out what points are within the radius, but does not render them on the screen correctly.. 
 
+var incidentsR = [];
+
 function findNearestCrimes(home, work, radius) {
 	console.log("Finding nearest crimes");
 	incidents.forEach(function(incident, index, arr) {
 			//console.log("checking to see if " + arr[index] + " is within radius");
 			if(withinRadius(incident, home, radius) && withinRadius(incident, work, radius)) {
 				if(satisfiesOptions(incident)) {
-						console.log("Incident " + index + " is within radius");
+						//console.log("Incident " + index + " is within radius");
 						arr[index].Selected = true;
+						incidentsR.push(arr[index]);
 				} else {
-					console.log("Incident " + index + " is within radius but does not satisfy options");
+					//console.log("Incident " + index + " is within radius but does not satisfy options");
+					arr[index].Selected = false;
 				}
 				
 			} else {
-				console.log("Incident " + index + " is not within radius");
+				//console.log("Incident " + index + " is not within radius");
 				arr[index].Selected = false;
 			}
 	});
 
-	drawPoints();
+	filterIncidentsR(options, incidentsR);
+
+	drawPointsR();
 }
 
 /*d3.select("svg").on("mousedown.log", function() {
