@@ -15,15 +15,9 @@ var homeLocation = [-122.433701, 37.787683]; //reset original point
 var workLocation = [-122.433701, 37.767683]; //reset original point
 var homeRadius = 3;
 var workRadius = 3;
-var selectRadius = 100; //Currently I hard-coded the radius just to test out functionality
 
-/*
-var bounds = d3.geo.bounds();
 
-function convertPixelsToGeo(x, y) {
-	var lat = 
-}*/
-
+// ------ All options are selected in default state to let user see all data
 var options = {
 	"DayOfWeek": ["Sunday", "Monday", "Tuesday","Wednesday", "Thursday", "Friday", "Saturday"],
 	"TimeRange": ["Morning", "Afternoon", "Night", "Late Night"],
@@ -34,7 +28,6 @@ var options = {
 var svg = d3.select("#map").append("svg")
 	.attr("width", width)
 	.attr("height", height);
-
 
 
 // Add svg map at correct size, assumes map is saved in a subdirectory called "data"
@@ -50,8 +43,6 @@ function drawPoints() {
 		return incident.Selected;
 	});
 
-	// console.log(filteredIncidents);
-
 	var map = d3.select("svg")
 		.selectAll("circle.incident")
 		.data(filteredIncidents, function(d) { return d.IncidentNumber; });
@@ -62,32 +53,11 @@ function drawPoints() {
 		.attr("cx", function(d) { return projection(d.Location)[0] })
 		.attr("cy", function(d) { return projection(d.Location)[1] }) //look at inverse projection
 		.attr("r", "2px")
-		.attr("fill", "rgba(255, 0, 0, 0.3)");
+		.attr("fill", "rgba(85, 34, 68, 0.3)");
 
 	map.exit().remove();
 }
 
-/*function drawPointsR() {
-
-	var filteredIncidents = incidentsR.filter(function(incident) {
-		return incident.Selected;
-	});
-
-	var map = d3.select("svg")
-		.selectAll("circle.incident")
-		.data(filteredIncidents);
-
-	map.enter()
-		.append("circle")
-		.filter(function(d) { return d.Selected })
-		.attr("class", "incident")
-		.attr("cx", function(d) { return projection(d.Location)[0] })
-		.attr("cy", function(d) { return projection(d.Location)[1] }) //look at inverse projection
-		.attr("r", "2px")
-		.attr("fill", "rgba(255, 0, 0, 0.3)");
-
-	map.exit().remove();
-}*/
 
 var drag = d3.behavior.drag()
     .on("drag", dragmove)
@@ -95,13 +65,10 @@ var drag = d3.behavior.drag()
     .on("dragend", function () {
     	filterIncidents(options);
     	drawPoints();
-    	//console.log("findNearestCrimes: " + homeLocation + workLocation + selectRadius);
-    	//findNearestCrimes(homeLocation, workLocation, selectRadius)
     });
 
 function dragmove(d) {
 
-	// console.log(d3.event);
 
 	var x = d3.event.x;
 	var y = d3.event.y;
@@ -111,8 +78,7 @@ function dragmove(d) {
 
 	var pointID = d3.select(this).attr("id");
 	var pointLocation = projection.invert([x, y]);
-	// var pointLocation = [x, y];
-	// console.log(pointLocation);
+
 
 	if(pointID === "home") {
 		homeLocation = pointLocation;
@@ -123,18 +89,6 @@ function dragmove(d) {
 	filterIncidents(options);
 	drawPoints();
 
-	//console.log(homeLocation, workLocation);
-	//findNearestCrimes();
-	//drawPoints();
-
-	//svg masks
-	//call when drag end 
-	//throttle
-
-
-  //var x = d3.event.x;
-  //var y = d3.event.y;
-  //attr 
 }
 
 function drawHome() {
@@ -149,26 +103,13 @@ function drawHome() {
 		.attr("id", "home")
 		.attr("cx", projection(homeLocation)[0])
 		.attr("cy", projection(homeLocation)[1])
-		.attr("r", "10px")
-		.attr("fill", "blue")
+		.attr("r", "14px")
+		.attr("fill", "#DB504A")
 		.call(drag);
-
-		/*
-		map.enter()
-		.append("circle")
-		.attr("id", "homeRadius")
-		.attr("cx1", function(d) {return projection(d)[0]})
-		.attr("cy2", function(d) { return projection(d)[1] })
-		.attr("r", "30px")
-		.attr("fill", "none")
-		.attr("stroke", "blue")
-		.attr("stroke-width", "6px");*/
-		
 
 		var homePoint = document.getElementsByClassName("home");
 
-			
-
+		map.exit().remove();
 
 }
 
@@ -183,9 +124,11 @@ function drawWork() {
 		.attr("id", "work")
 		.attr("cx", projection(workLocation)[0])
 		.attr("cy", projection(workLocation)[1])
-		.attr("r", "10px")
-		.attr("fill", "green")
+		.attr("r", "14px")
+		.attr("fill", "#084C61")
 		.call(drag);
+
+		map.exit().remove();
 
 }
 
@@ -238,26 +181,6 @@ function filterIncidents(options) {
 	});
 }
 
-/*function filterIncidentsR(options, radiusIncidents) {
-	radiusIncidents.forEach(function(incident, index, arr) {
-		if (options.DayOfWeek.indexOf(incident.DayOfWeek) < 0) {
-			arr[index].Selected = false;
-			return;
-		}
-
-		if (options.Category.indexOf(incident.Category) < 0) {
-			arr[index].Selected = false;
-			return;
-		}
-
-		if (options.TimeRange.indexOf(incident.TimeRange) < 0) {
-			arr[index].Selected = false;
-			return;
-		}
-
-		arr[index].Selected = true;
-	});
-}*/
 
 function emptyOptions() {
 	options.DayOfWeek = [];
@@ -288,7 +211,6 @@ d3.json("scpd_incidents.json", function(error, scpd_incidents) {
 function dayIndex(button) {
 	var DayOfWeek = button.value;
 	var existingIndex = options.DayOfWeek.indexOf(DayOfWeek);
-	console.log("Index of " + button.value + " = " + existingIndex);
 	return existingIndex;
 }
 
@@ -304,11 +226,9 @@ function addOrRemoveDay(button) {
 
 function attachDayListeners() {
 	var buttons = document.getElementsByClassName("day-btn");
-	console.log(buttons);
 	var handleClick = function(e) {
 		var button = e.target;
 		var DayOfWeek = button.value;
-		console.log(DayOfWeek);
 		if(DayOfWeek === "AllDays") { //handling the toggle on and off for all options
 				for(var i = 0; i < buttons.length; i++) {
 					if(dayIndex(buttons[i]) === -1 ) {
@@ -322,7 +242,6 @@ function attachDayListeners() {
 			
 		} else if (DayOfWeek === "NotAllDays") {
 			options.DayOfWeek = [];
-			console.log(options);
 			for(var i = 0; i < buttons.length; i++) {
 				buttons[i].classList.remove("active");
 			}
@@ -336,7 +255,6 @@ function attachDayListeners() {
 		
 		filterIncidents(options);
 		drawPoints();
-		console.log(options.DayOfWeek);
 	};
 
 	for (var i = 0; i < buttons.length; i++) {
@@ -347,7 +265,6 @@ function attachDayListeners() {
 function timeIndex(button) {
 	var TimeRange = button.value;
 	var existingIndex = options.TimeRange.indexOf(TimeRange);
-		console.log("Index of " + button.value + " = " + existingIndex);
 	return existingIndex;
 }
 
@@ -381,7 +298,6 @@ function attachTimeListeners() {
 			
 		} else if (TimeRange === "NotAllTimes") {
 			options.TimeRange = [];
-			console.log(options);
 			for(var i = 0; i < buttons.length; i++) {
 				buttons[i].classList.remove("active");
 			}
@@ -392,8 +308,8 @@ function attachTimeListeners() {
 
 		filterIncidents(options);
 		drawPoints();
-
-		console.log(options.TimeRange);
+		drawHome();
+		drawWork();
 
 	};
 
@@ -405,7 +321,6 @@ function attachTimeListeners() {
 function categoryIndex(button) {
 	var Category = button.value;
 	var existingIndex = options.Category.indexOf(Category);
-	console.log("Index of " + button.value + " = " + existingIndex);
 	return existingIndex;
 }
 
@@ -439,7 +354,6 @@ function attachCategoryListeners() {
 
 		} else if (category === "NotAllCategories") {
 			options.Category = [];
-			console.log(options);
 			for(var i = 0; i < buttons.length; i++) {
 				buttons[i].classList.remove("active");
 			}
@@ -450,7 +364,6 @@ function attachCategoryListeners() {
 
 		filterIncidents(options);
 		drawPoints();
-		console.log(options.Category);
 
 	};
 
@@ -459,42 +372,44 @@ function attachCategoryListeners() {
 	}
 }
 
-/*function attachResetListener() {
-	var buttons = document.getElementsByClassName("reset-btn");
-
-	var handleClick = function(e) {
-		var allButtons = document.getElementsByClassName("default-selected");
-		for (var i = 0; i < allButtons.length; i++) {
-			allButtons[i].classList.add("active");
-		}
-		options = {
-			"DayOfWeek": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-			"TimeRange": ["Morning", "Afternoon", "Night", "Late Night"],
-			"Category": ["ARSON", "ASSAULT", "BRIBERY", "BURGLARY", "DISORDERLY CONDUCT", "DRIVING UNDER THE INFLUENCE", "DRUG/NARCOTIC", "DRUNKENNESS", "EMBEZZLEMENT", "EXTORTION", "FAMILY OFFENSES", "FORGERY/COUNTERFEITING", "FRAUD", "GAMBLING", "KIDNAPPING", "LARCENY/THEFT", "LIQUOR LAWS", "LOITERING", "MISSING PERSON", "NON-CRIMINAL", "OTHER OFFENSES", "PROSTITUTION", "ROBBERY", "RUNAWAY", "SECONDARY CODES", "SEX OFFENSES, FORCIBLE", "SEX OFFENSES, NON FORCIBLE", "STOLEN PROPERTY", "SUICIDE", "SUSPICIOUS OCC", "TRESPASS", "VANDALISM", "VEHICLE THEFT", "WARRANTS", "WEAPON LAWS"]
-		}
-		
-		filterIncidents(options);
-		drawPoints();
-	};
-	
-
-	console.log(options.DayOfWeek);
-	console.log(options.TimeRange);
-	console.log(options.Category);
-
-	buttons[0].addEventListener("click", handleClick);
-}*/
-
 document.addEventListener("DOMContentLoaded", function() {
 	attachDayListeners();
 	attachTimeListeners();
 	attachCategoryListeners();
-	//attachResetListener();
+	initializeSliders();
 });
 
 
+function initializeSliders() {
+	var sliderOptions = {
+		connect: "lower",
+		start: [90],
+		range: {
+			"min": [0],
+			"max": [100],
+		}
+	};
+
+
+	var homeSlider = document.getElementById("home-slider");
+	noUiSlider.create(homeSlider, sliderOptions);
+	homeSlider.noUiSlider.on("update", function(value) {
+		homeRadius = parseFloat(value[0]) / 10;
+		filterIncidents(options);
+		drawPoints();
+	});
+
+	var workSlider = document.getElementById("work-slider");
+	noUiSlider.create(workSlider, sliderOptions);
+	workSlider.noUiSlider.on("update", function(value) {
+		workRadius = parseFloat(value[0]) / 10;
+		filterIncidents(options);
+		drawPoints();
+	});
+}
+
 /**
-	---------- Adding home and work location on the map ----------
+	---------- Distance/Radius calculations ----------
 **/
 
 
@@ -504,75 +419,16 @@ function getDistance(incident, point) {
 
 	return Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2));
 
-  	// return Math.sqrt(Math.pow((incident[0]-point[0]), 2) + Math.pow((incident[1]-point[1]), 2));
   }
 
 function withinRadius(incident, point, radius, conversion) {
-	// incident is in lat/long, point is in pixels, radius is in ??? (pixels)
-
-	// console.log(incident.Location, point, radius);
 
 	var incidentXY = incident.Location.map(function(i) { return parseFloat(i); });
 	var pointXY = point.map(function(i) { return parseFloat(i); });
 
-	//fix it such that it finds the distance in XY coords, but still displays in latlong
-
-	// console.log(incidentXY, point);
 	var distance = getDistance(incidentXY, point);
-	//console.log("Distance to incident: (x)" + incidentXY[0] + " (y)" + incidentXY[1] + " is " + distance);
 
-	// console.log(point);
-
-	// console.log(distance);
 	return distance <= conversion;
-	//var distance = getDistance(latitude, incident.Location[0], longitude, incident.Location[1]);
-	//return (distance <= radius);
 }
 
-/*function satisfiesOptions(incident) {
-	var dayIndex = options.DayOfWeek.indexOf(incident.DayOfWeek);
-	var timeIndex = options.TimeRange.indexOf(incident.TimeRange);
-	var categoryIndex = options.Category.indexOf(incident.Category);
-	return (dayIndex > -1 && timeIndex > -1 && categoryIndex > -1);
 
-}*/
-
-//Currently registers and figures out what points are within the radius, but does not render them on the screen correctly.. 
-
-/*var incidentsR = [];
-
-function findNearestCrimes(home, work, radius) {
-	console.log("Finding nearest crimes");
-	incidents.forEach(function(incident, index, arr) {
-			//console.log("checking to see if " + arr[index] + " is within radius");
-			if(withinRadius(incident, home, radius) && withinRadius(incident, work, radius)) {
-				if(satisfiesOptions(incident)) {
-						//console.log("Incident " + index + " is within radius");
-						arr[index].Selected = true;
-						incidentsR.push(arr[index]);
-				} else {
-					//console.log("Incident " + index + " is within radius but does not satisfy options");
-					arr[index].Selected = false;
-				}
-				
-			} else {
-				//console.log("Incident " + index + " is not within radius");
-				arr[index].Selected = false;
-			}
-	});
-
-	filterIncidentsR(options, incidentsR);
-
-	drawPointsR();
-}*/
-
-
-function testspecialname(ele) {
-    if(ele.id === "homeR") {
-    	homeRadius = parseInt(ele.value);
-    } else if (ele.id == "workR") {
-    	workRadius = parseInt(ele.value);
-    }
-    filterIncidents(options);
-    drawPoints();
-}
