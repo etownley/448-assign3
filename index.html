@@ -15,6 +15,11 @@
 			right: 100px;
 		}
 
+		#input{
+			padding-top: 10px;
+			padding-bottom: 5px;
+		}
+
 		.button-wrapper .btn {
     margin-bottom:5px;
 }
@@ -45,6 +50,13 @@
 	<div id = "maptitle">San Francisco Crime</div>
 	<div id = "mapsubtitle">April 1-15, 2016</div>
 	<div id="sidebar" class = 'button-wrapper'>
+		<div id="input">
+			Radius for Home: <input type="text" id="homeR" onkeydown="testspecialname(this)" />
+		</div>
+	<div id="input">
+		Radius for Work: <input type="text" id="workR" onkeydown="testspecialname(this)" />
+	</div>
+
 		<!--<button class="selection-btn btn btn-primary home-btn" value="Home">Select home location</button>
 		<p style = "padding-top: 10px;">
 		<button class="selection-btn btn btn-primary work-btn" value="Work">Select work location</button>-->

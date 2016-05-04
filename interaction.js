@@ -11,8 +11,10 @@ var projection = d3.geo.mercator()
 	.translate([width / 2, height / 2]); //translates origin of map to this position
 
 var incidents = [];
-var homeLocation = [300, 300]; //reset original poin
-var workLocation = [500, 400]; //reset original point
+var homeLocation = [-122.433701, 37.787683]; //reset original point
+var workLocation = [-122.433701, 37.767683]; //reset original point
+var homeRadius = 3;
+var workRadius = 3;
 var selectRadius = 100; //Currently I hard-coded the radius just to test out functionality
 
 /*
@@ -42,19 +44,20 @@ svg.append("image")
 	.attr("xlink:href", "data/sf-map.svg");
 
 // -------------- LINK ARRAY OF INCIDENTS TO DOM ELEMENTS ---------------
-function drawPoints(drawAll) {
+function drawPoints() {
 
 	var filteredIncidents = incidents.filter(function(incident) {
 		return incident.Selected;
 	});
 
+	// console.log(filteredIncidents);
+
 	var map = d3.select("svg")
 		.selectAll("circle.incident")
-		.data(filteredIncidents);
+		.data(filteredIncidents, function(d) { return d.IncidentNumber; });
 
 	map.enter()
 		.append("circle")
-		.filter(function(d) { return d.Selected })
 		.attr("class", "incident")
 		.attr("cx", function(d) { return projection(d.Location)[0] })
 		.attr("cy", function(d) { return projection(d.Location)[1] }) //look at inverse projection
@@ -88,6 +91,7 @@ function drawPoints(drawAll) {
 
 var drag = d3.behavior.drag()
     .on("drag", dragmove)
+
     .on("dragend", function () {
     	filterIncidents(options);
     	drawPoints();
@@ -96,19 +100,28 @@ var drag = d3.behavior.drag()
     });
 
 function dragmove(d) {
-	d3.select(this).attr("cx", d.x = d3.event.x).attr("cy", d.y = d3.event.y);
+
+	// console.log(d3.event);
+
+	var x = d3.event.x;
+	var y = d3.event.y;
+
+	d3.select(this).attr("cx", x).attr("cy", y);
 	
 
 	var pointID = d3.select(this).attr("id");
-	//var pointLocation = projection.invert(d3.select(this).attr("cx"));
-	var pointLocation = [d3.select(this).attr("cx"), d3.select(this).attr("cy")];
-
+	var pointLocation = projection.invert([x, y]);
+	// var pointLocation = [x, y];
+	// console.log(pointLocation);
 
 	if(pointID === "home") {
 		homeLocation = pointLocation;
 	} else {
 		workLocation = pointLocation;
 	}
+
+	filterIncidents(options);
+	drawPoints();
 
 	//console.log(homeLocation, workLocation);
 	//findNearestCrimes();
@@ -134,8 +147,8 @@ function drawHome() {
 		map.enter()
 		.append("circle")
 		.attr("id", "home")
-		.attr("cx", homeLocation[0])
-		.attr("cy", homeLocation[1])
+		.attr("cx", projection(homeLocation)[0])
+		.attr("cy", projection(homeLocation)[1])
 		.attr("r", "10px")
 		.attr("fill", "blue")
 		.call(drag);
@@ -168,8 +181,8 @@ function drawWork() {
 		.enter()
 		.append("circle")
 		.attr("id", "work")
-		.attr("cx", workLocation[0])
-		.attr("cy", workLocation[1])
+		.attr("cx", projection(workLocation)[0])
+		.attr("cy", projection(workLocation)[1])
 		.attr("r", "10px")
 		.attr("fill", "green")
 		.call(drag);
@@ -192,14 +205,16 @@ function convertTimeToRange(time) {
 	}
 }
 
+
+
 /*
  * This function selects/deselects incidents based on criteria as specified in the
  * options object.
  */
 function filterIncidents(options) {
 	incidents.forEach(function(incident, index, arr) {
-
-		if(!withinRadius(incident, homeLocation, selectRadius) || !withinRadius(incident, workLocation, selectRadius)) {
+		if ( !withinRadius(incident, homeLocation, homeRadius, homeRadius/100) ||
+			 !withinRadius(incident, workLocation, workRadius, workRadius/100)) {
 			arr[index].Selected = false;
 			return;
 		}
@@ -261,8 +276,6 @@ d3.json("scpd_incidents.json", function(error, scpd_incidents) {
 	drawPoints();
 	drawHome();
 	drawWork();
-	makeSlider("home");
-	makeSlider("work");
 
 	var buttons = document.getElementsByClassName("default-selected");
 	for(var i = 0; i < buttons.length; i++) {
@@ -486,32 +499,47 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 function getDistance(incident, point) {
-  	return Math.sqrt(Math.pow((incident[0]-point[0]), 2) + Math.pow((incident[1]-point[1]), 2));
+	var xDistance = incident[0] - point[0];
+	var yDistance = incident[1] - point[1];
+
+	return Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2));
+
+  	// return Math.sqrt(Math.pow((incident[0]-point[0]), 2) + Math.pow((incident[1]-point[1]), 2));
   }
 
-function withinRadius(incident, point, radius) {
-	//fix it such that it finds the distance in XY coords, but still displays in latlong
-	 
-	var incidentXY = projection(incident.Location);
+function withinRadius(incident, point, radius, conversion) {
+	// incident is in lat/long, point is in pixels, radius is in ??? (pixels)
 
+	// console.log(incident.Location, point, radius);
+
+	var incidentXY = incident.Location.map(function(i) { return parseFloat(i); });
+	var pointXY = point.map(function(i) { return parseFloat(i); });
+
+	//fix it such that it finds the distance in XY coords, but still displays in latlong
+
+	// console.log(incidentXY, point);
 	var distance = getDistance(incidentXY, point);
 	//console.log("Distance to incident: (x)" + incidentXY[0] + " (y)" + incidentXY[1] + " is " + distance);
-	return distance <= radius;
+
+	// console.log(point);
+
+	// console.log(distance);
+	return distance <= conversion;
 	//var distance = getDistance(latitude, incident.Location[0], longitude, incident.Location[1]);
 	//return (distance <= radius);
 }
 
-function satisfiesOptions(incident) {
+/*function satisfiesOptions(incident) {
 	var dayIndex = options.DayOfWeek.indexOf(incident.DayOfWeek);
 	var timeIndex = options.TimeRange.indexOf(incident.TimeRange);
 	var categoryIndex = options.Category.indexOf(incident.Category);
 	return (dayIndex > -1 && timeIndex > -1 && categoryIndex > -1);
 
-}
+}*/
 
 //Currently registers and figures out what points are within the radius, but does not render them on the screen correctly.. 
 
-var incidentsR = [];
+/*var incidentsR = [];
 
 function findNearestCrimes(home, work, radius) {
 	console.log("Finding nearest crimes");
@@ -536,88 +564,15 @@ function findNearestCrimes(home, work, radius) {
 	filterIncidentsR(options, incidentsR);
 
 	drawPointsR();
-}
+}*/
 
-/*d3.select("svg").on("mousedown.log", function() {
-  selectedPoint = projection.invert(d3.mouse(this));
-  if(mouseClick === 0) {
-  	location1 = selectedPoint;
-  	mouseClick++;
-  } else {
-  	location2 = selectedPoint;
-  	mouseClick--;
-  }
-  console.log(location1[0], location1[1], location2[0], location2[1], mouseClick);
-  findNearestCrimes(location1[0], location1[1], location2[0], location2[1], selectRadius);
- 
-});*/
 
-// ---------------- MAKING RADIUS SLIDER -------------------
-
-function makeSlider(title) {
-
-	var sliderType = title;
-
-var margin = {top: 0, right: 50, bottom: 0, left: 50},
-    width = 200,
-    height = 200;
-
-var x = d3.scale.linear()
-    .domain([0, 50])
-    .range([0, width])
-
-var brush = d3.svg.brush()
-    .x(x)
-    .extent([0, 0])
-    .on("brush", brushed);
-
-var svg = d3.select("body").append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-svg.append("g")
-    .attr("class", "x axis")
-    .attr("transform", "translate(0," + height / 2 + ")")
-    .call(d3.svg.axis()
-      .scale(x)
-      .orient("bottom")
-      .tickFormat(function(d) { return d; })
-      .tickSize(1)
-      .tickPadding(12))
-  .select(".domain")
-  .select(function() { return this.parentNode.appendChild(this.cloneNode(true)); })
-    .attr("class", "halo");
-
-var slider = svg.append("g")
-    .attr("class", "slider")
-    .call(brush);
-
-slider.selectAll(".extent,.resize")
-    .remove();
-
-slider.select(".background")
-    .attr("height", height);
-
-var handle = slider.append("circle")
-    .attr("class", "handle")
-    .attr("transform", "translate(0," + height / 2 + ")")
-    .attr("r", 9);
-
-slider
-    .call(brush.event)
-    .call(brush.extent([25, 25]))
-    .call(brush.event);
-
-function brushed() {
-  var value = brush.extent()[0];
-
-  if (d3.event.sourceEvent) { // not a programmatic event
-    value = x.invert(d3.mouse(this)[0]);
-    brush.extent([value, value]);
-  }
-
-  handle.attr("cx", x(value));
-}
+function testspecialname(ele) {
+    if(ele.id === "homeR") {
+    	homeRadius = parseInt(ele.value);
+    } else if (ele.id == "workR") {
+    	workRadius = parseInt(ele.value);
+    }
+    filterIncidents(options);
+    drawPoints();
 }
